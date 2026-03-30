@@ -9,7 +9,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container">
         <a href="/" className="logo">
-          Art<span>Lagos</span>
+          Art<span>Gallery</span>
         </a>
 
         <button
@@ -18,6 +18,7 @@ export default function Navbar() {
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
+
 
         <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
           <li>
@@ -37,11 +38,6 @@ export default function Navbar() {
           </li>
         </ul>
 
-        <div className="nav-actions">
-          <button className="search-btn">
-            <Search size={20} />
-          </button>
-        </div>
       </div>
     </nav>
   );

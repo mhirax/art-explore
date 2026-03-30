@@ -4,9 +4,11 @@ import Hero from "./components/hero/Hero";
 import ExhibitionCarousel from "./components/exhibitions/ExhibitionCarousel";
 import NewsSection from "./components/news/NewsSection";
 import LagosMap from "./components/map/LagosMap";
+
 import GalleryGrid from "./components/gallery/GalleryGrid";
 import FilterSidebar from "./components/filters/FilterSidebar";
 import { galleries } from "./data/galleries";
+import ArtGalleryFinder from "./components/ArtGalleryFinder";
 import "./App.scss";
 
 function App() {
@@ -46,9 +48,11 @@ function App() {
       <Navbar />
       <Hero />
       <ExhibitionCarousel />
+      <LagosMap />
+      <ArtGalleryFinder />
       <GalleryGrid galleries={filteredGalleries} />
       <NewsSection />
-      <LagosMap />
+
       <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
 
       <footer className="footer">

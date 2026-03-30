@@ -24,11 +24,10 @@ export const galleries = [
     description:
       "One of Nigeria's largest art galleries, founded by renowned artist Nike Davies-Okundaye. Features traditional and contemporary Nigerian art, textiles, and workshops.",
     images: [
-      "https://images.unsplash.com/photo-1577083552431-6e5fd01988ec",
-      "https://images.unsplash.com/photo-1562322140-8baeececf3df",
+      "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhy7KJL47g6IHPRHIkkUHXX3VfAXZtTs_88wiamTpmD8661Z5h2TJkQ0698cryU7M-qoecD6Iu96wB-WmOFCYpSHrWQJOow8FCmkfy8eqeM5RH9aU07lkDrIHOVdeSQnkyhSQKkJo-lTg/s1600/The+AfroFusion+Spot+-+Nike+Art+Gallery+lagos+Nigeria+%252810%2529..jpg",
     ],
     featuredImage:
-      "https://images.unsplash.com/photo-1577083552431-6e5fd01988ec",
+      "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhy7KJL47g6IHPRHIkkUHXX3VfAXZtTs_88wiamTpmD8661Z5h2TJkQ0698cryU7M-qoecD6Iu96wB-WmOFCYpSHrWQJOow8FCmkfy8eqeM5RH9aU07lkDrIHOVdeSQnkyhSQKkJo-lTg/s1600/The+AfroFusion+Spot+-+Nike+Art+Gallery+lagos+Nigeria+%252810%2529..jpg",
     artTypes: ["painting", "textile", "sculpture", "traditional"],
     currentExhibition: {
       title: "Echoes of Heritage",
@@ -75,7 +74,8 @@ export const galleries = [
       "https://images.unsplash.com/photo-1562322140-8baeececf3df",
       "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5",
     ],
-    featuredImage: "https://images.unsplash.com/photo-1562322140-8baeececf3df",
+    featuredImage:
+      "https://sumellist.com/wp-content/uploads/2023/02/2019-03-14.jpg",
     artTypes: ["painting", "sculpture", "photography", "mixed-media"],
     currentExhibition: {
       title: "Fragments of Memory",
@@ -122,7 +122,7 @@ export const galleries = [
       "https://images.unsplash.com/photo-1544967082-d9d25d867d43",
     ],
     featuredImage:
-      "https://images.unsplash.com/photo-1536924940840-4c65e17e500c",
+      "https://cimages.timbu.com/guides/2017/08/omenka9-1024x682.jpeg",
     artTypes: ["painting", "sculpture", "digital-art"],
     currentExhibition: {
       title: "Urban Rhythms",
@@ -169,7 +169,8 @@ export const galleries = [
       "https://images.unsplash.com/photo-1544967082-d9d25d867d43",
       "https://images.unsplash.com/photo-1531058020387-3be344556be6",
     ],
-    featuredImage: "https://images.unsplash.com/photo-1544967082-d9d25d867d43",
+    featuredImage:
+      "https://rexclarkeadventures.com/wp-content/uploads/2024/09/terra-kulture-lagos-1-1024x576-1.jpg",
     artTypes: ["painting", "sculpture", "theater", "literature"],
     currentExhibition: {
       title: "Nigeria @ 64: A Visual Journey",
@@ -216,7 +217,7 @@ export const galleries = [
       "https://images.unsplash.com/photo-1536924940840-4c65e17e500c",
     ],
     featuredImage:
-      "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5",
+      "https://artlogic-res.cloudinary.com/w_1200,h_630,c_fill,f_auto,fl_lossy,q_auto/ws-smocontemporaryart/usr/library/images/main/pages/1/lai_0644-2.jpg",
     artTypes: ["painting", "mixed-media", "installation", "photography"],
     currentExhibition: {
       title: "Lagos Uncovered",
@@ -263,7 +264,7 @@ export const galleries = [
       "https://images.unsplash.com/photo-1544967082-d9d25d867d43",
     ],
     featuredImage:
-      "https://images.unsplash.com/photo-1531058020387-3be344556be6",
+      "https://artlogic-res.cloudinary.com/w_1200,h_630,c_fill,f_webp,fl_lossy,q_auto:good/ws-stephenfriedman/usr/images/news/list_image/items/7b/7b0dfe0b990d448289399a5add80376a/cri03068-990000079e04513c.jpg",
     artTypes: ["painting", "sculpture", "installation", "multidisciplinary"],
     currentExhibition: {
       title: "Residency Showcase: Summer 2024",
@@ -309,7 +310,7 @@ export const galleries = [
       "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5",
     ],
     featuredImage:
-      "https://images.unsplash.com/photo-1536924940840-4c65e17e500c",
+      "https://news.artnet.com/app/news-upload/2020/02/AS5A3055-1024x683.jpg",
     artTypes: ["historical", "archaeological", "traditional", "sculpture"],
     currentExhibition: {
       title: "Benin Bronzes: Return & Reclaim",
@@ -356,7 +357,8 @@ export const galleries = [
       "https://images.unsplash.com/photo-1562322140-8baeececf3df",
       "https://images.unsplash.com/photo-1531058020387-3be344556be6",
     ],
-    featuredImage: "https://images.unsplash.com/photo-1562322140-8baeececf3df",
+    featuredImage:
+      "https://independent.ng/wp-content/uploads/WhatsApp-Image-2023-11-10-at-14.03.31.jpeg",
     artTypes: ["painting", "sculpture", "digital-art", "video-art"],
     currentExhibition: {
       title: "Digital Frontiers",

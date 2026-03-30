@@ -6,7 +6,7 @@ import {
   Phone,
   Mail,
   Globe,
-  Instagram,
+  
   CalendarDays,
 } from "lucide-react";
 import { useEffect } from "react";

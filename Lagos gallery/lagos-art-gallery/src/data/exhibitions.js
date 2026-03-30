@@ -7,7 +7,8 @@ export const currentExhibitions = [
     artist: "Chief Nike Davies-Okundaye",
     startDate: "2024-06-01",
     endDate: "2024-07-30",
-    image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5",
+    image:
+      "https://thewheatbakerlagos.com/oatchace/2025/06/nike-art-gallery.webp",
     description:
       "A retrospective showcasing four decades of textile art and paintings celebrating Yoruba heritage.",
     featured: true,
@@ -20,7 +21,8 @@ export const currentExhibitions = [
     artist: "Temitayo Ogunbiyi",
     startDate: "2024-06-10",
     endDate: "2024-07-25",
-    image: "https://images.unsplash.com/photo-1536924940840-4c65e17e500c",
+    image:
+      "https://www.noguchi.org/wp-content/uploads/2024/10/Temitayo-Ogunbiyi-6-Noguchi-Museum-Photo-by-Chanel-Matsunami-Govreau-INFGM-ARS-2048x1365.jpg",
     description:
       "Exploring memory through mixed media installations and sculptures.",
     featured: true,
@@ -33,7 +35,8 @@ export const currentExhibitions = [
     artist: "Olu Amoda",
     startDate: "2024-06-05",
     endDate: "2024-07-20",
-    image: "https://images.unsplash.com/photo-1544967082-d9d25d867d43",
+    image:
+      "https://tse4.mm.bing.net/th/id/OIP.wcAg9Wrixz-eFr2N6qL5tgHaE7?pid=Api&h=220&P=0",
     description:
       "Metal sculptures exploring urban life and industrial materials.",
     featured: true,
