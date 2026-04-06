@@ -5,3 +5,5 @@ export default function Loader() {
     </div>
   );
 }
+
+///what is loader

@@ -2,13 +2,10 @@ import { useState, useMemo } from "react";
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/hero/Hero";
 import ExhibitionCarousel from "./components/exhibitions/ExhibitionCarousel";
-import NewsSection from "./components/news/NewsSection";
 import LagosMap from "./components/map/LagosMap";
-
 import GalleryGrid from "./components/gallery/GalleryGrid";
 import FilterSidebar from "./components/filters/FilterSidebar";
 import { galleries } from "./data/galleries";
-import ArtGalleryFinder from "./components/ArtGalleryFinder";
 import "./App.scss";
 
 function App() {
@@ -49,12 +46,8 @@ function App() {
       <Hero />
       <ExhibitionCarousel />
       <LagosMap />
-      <ArtGalleryFinder />
       <GalleryGrid galleries={filteredGalleries} />
-      <NewsSection />
-
       <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
-
       <footer className="footer">
         <div className="container">
           <p>&copy; 2024 ArtLagos Directory. All rights reserved.</p>
