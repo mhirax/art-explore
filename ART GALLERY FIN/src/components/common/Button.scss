@@ -1,0 +1,31 @@
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 16px;
+  
+  &-primary {
+    background: #d97706;
+    color: white;
+    
+    &:hover {
+      background: #b45309;
+      transform: translateY(-2px);
+    }
+  }
+  
+  &-outline {
+    background: transparent;
+    border: 2px solid #d97706;
+    color: #d97706;
+    
+    &:hover {
+      background: #d97706;
+      color: white;
+    }
+  }
+}
