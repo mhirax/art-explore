@@ -9,7 +9,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container">
         <a href="/" className="logo">
-          Art<span>Explore</span>
+          Art<span className="explore">Explore</span>
         </a>
 
         <button

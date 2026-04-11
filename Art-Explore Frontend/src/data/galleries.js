@@ -1,3 +1,4 @@
+//ART GALLERIES DATA
 export const galleries = [
   {
     id: 1,
@@ -377,6 +378,7 @@ export const galleries = [
   },
 ];
 
+
 export const neighborhoods = [
   "All",
   "Ikoyi",
@@ -386,6 +388,7 @@ export const neighborhoods = [
   "Lagos Island",
   "Surulere",
 ];
+
 export const artTypes = [
   "All",
   "Labels Gallery",
