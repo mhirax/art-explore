@@ -3,6 +3,7 @@ import Navbar from "./components/layout/Navbar";
 import Hero from "./components/layout/Hero";
 import LagosMap from "./components/map/LagosMap";
 import GalleryGrid from "./components/gallery/GalleryGrid";
+import MapView from "./components/map/MapView";
 import FilterSidebar from "./components/filter/FilterSidebar";
 import { galleries } from "./data/galleries";
 import "./App.scss";
@@ -10,6 +11,9 @@ import "./App.scss";
 function App() {
   const [filteredGalleries, setFilteredGalleries] = useState(galleries);
   const [activeFilters, setActiveFilters] = useState({});
+
+  // ADD THIS - State for map region view (fixes the setViewRegion error)
+  const [viewRegion, setViewRegion] = useState("All");
 
   const handleFilter = (filters) => {
     setActiveFilters(filters);
@@ -43,9 +47,34 @@ function App() {
     <div className="app">
       <Navbar />
       <Hero />
-      <LagosMap />
+      <LagosMap region={viewRegion} />
+      {/* REGION BUTTONS - These now work with setViewRegion */}
+      <div className="region-buttons">
+        <button
+          className={viewRegion === "All" ? "active" : ""}
+          onClick={() => setViewRegion("All")}
+        >
+          All REGION
+        </button>
+        <button
+          className={viewRegion === "Island" ? "active" : ""}
+          onClick={() => setViewRegion("Island")}
+        >
+          ISLAND
+        </button>
+        <button
+          className={viewRegion === "Mainland" ? "active" : ""}
+          onClick={() => setViewRegion("Mainland")}
+        >
+          MAINLAND
+        </button>
+      </div>
+
+      <MapView region={viewRegion} />
+
       <GalleryGrid galleries={filteredGalleries} />
       <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
+
       <footer className="footer">
         <div className="container">
           <p>&copy; 2024 ArtLagos Directory. All rights reserved.</p>
@@ -56,6 +85,6 @@ function App() {
       </footer>
     </div>
   );
-};
+}
 
 export default App;

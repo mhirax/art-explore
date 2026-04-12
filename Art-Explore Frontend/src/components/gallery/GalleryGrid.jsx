@@ -24,7 +24,9 @@ export default function GalleryGrid({ galleries }) {
       <section className="gallery-grid-section">
         <div className="container">
           <div className="section-header">
-            <h2>All Art Galleries in Lagos</h2>
+            <h2 className="grid-header">
+              All <span className="artspan">Art Galleries</span> in Lagos
+            </h2>
             <p>
               Discover 20+ galleries, museums, and art spaces across the city
             </p>

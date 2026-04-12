@@ -10,46 +10,14 @@ export default function MapSection() {
     <section className="map-section">
       <div className="container">
         <div className="section-header">
-          <h2>Geographical Locations in Nigeria</h2>
-          <p>Discover art events across Lagos and other Nigerian cities</p>
+          <h2>
+            Geographical <span className="mapspan">Map Locations</span> in Nigeria.
+          </h2>
+          <p>
+            Discover art galleries co-ordinate and address location across
+            different region in lagos cities
+          </p>
         </div>
-
-        <div className="map-container">
-          <iframe
-            title="Nigeria Art Gallery Map"
-            src={mapUrl}
-            width="100%"
-            height="450"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-          />
-        </div>
-
-        <div className="map-info">
-          <div className="info-card">
-            <h3>📍 Lagos Art Hub</h3>
-            <p>Victoria Island, Lagos, Nigeria</p>
-            <small>Current Exhibition: "Modern African Masters"</small>
-          </div>
-          <div className="info-card">
-            <h3>📍 Nike Art Gallery</h3>
-            <p>Lekki, Lagos, Nigeria</p>
-            <small>Current Exhibition: "Traditional Meets Contemporary"</small>
-          </div>
-          <div className="info-card">
-            <h3>📍 Terra Kulture</h3>
-            <p>Victoria Island, Lagos, Nigeria</p>
-            <small>Coming Soon: "Nigerian Renaissance"</small>
-          </div>
-        </div>
-
-        <p className="map-note">
-          <small>
-            📍 Full map integration with zoom and navigation coming soon! This
-            is a preview of upcoming art venues in Lagos.
-          </small>
-        </p>
       </div>
     </section>
   );

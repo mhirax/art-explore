@@ -1,6 +1,20 @@
+
+
+
+
+
 .gallery-grid-section {
   padding: 80px 0;
   background: white;
+  
+  .grid-header {
+          font-family: "Lobster", sans-serif;
+font-size: 40px;
+  }
+
+  .artspan{
+    color: #b45309;
+  }
   
   .galleries-grid {
     display: grid;
