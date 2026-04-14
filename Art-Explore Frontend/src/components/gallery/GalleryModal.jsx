@@ -53,25 +53,7 @@ export default function GalleryModal({ gallery, onClose }) {
               </span>
             </div>
 
-            <div className="modal-actions">
-              <button onClick={handleAddToMap} className="action-btn map-btn">
-                <MapPin size={18} />
-                Add to Map
-              </button>
-              <button
-                onClick={handleSetReminder}
-                className="action-btn reminder-btn"
-              >
-                <CalendarDays size={18} />
-                Set Reminder
-              </button>
-              <button
-                onClick={handleScreenshot}
-                className="action-btn screenshot-btn"
-              >
-                📸 Screenshot
-              </button>
-            </div>
+           
 
             <div className="modal-info-grid">
               <div className="info-item">

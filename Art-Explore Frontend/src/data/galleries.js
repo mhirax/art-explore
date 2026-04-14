@@ -1,9 +1,12 @@
-//ART GALLERIES DATA
+// src/data/galleryData.js
+
+// ART GALLERIES DATA WITH VENUETYPE ADDED
 export const galleries = [
   {
     id: 1,
     name: "Nike Art Gallery",
     type: "commercial-gallery",
+    venueType: "Gallery", // ADDED for filtering
     neighborhood: "Lekki",
     address: "2, Elegushi Road, Lekki Phase 1, Lagos",
     coordinates: { lat: 6.4345, lng: 3.4683 },
@@ -51,6 +54,7 @@ export const galleries = [
     id: 2,
     name: "Rele Gallery",
     type: "commercial-gallery",
+    venueType: "Gallery", // ADDED for filtering
     neighborhood: "Victoria Island",
     address: "7, Military Street, Onikan, Lagos Island",
     coordinates: { lat: 6.4435, lng: 3.4125 },
@@ -98,6 +102,7 @@ export const galleries = [
     id: 3,
     name: "Omenka Gallery",
     type: "commercial-gallery",
+    venueType: "Gallery", // ADDED for filtering
     neighborhood: "Ikoyi",
     address: "24, Alexander Avenue, Ikoyi, Lagos",
     coordinates: { lat: 6.4545, lng: 3.4325 },
@@ -146,6 +151,7 @@ export const galleries = [
     id: 4,
     name: "Terra Kulture",
     type: "art-center",
+    venueType: "Art center", // ADDED for filtering
     neighborhood: "Victoria Island",
     address: "1376, Tiamiyu Savage Street, Victoria Island, Lagos",
     coordinates: { lat: 6.4345, lng: 3.4285 },
@@ -193,6 +199,7 @@ export const galleries = [
     id: 5,
     name: "SMO Contemporary Art",
     type: "commercial-gallery",
+    venueType: "Gallery", // ADDED for filtering
     neighborhood: "Ikoyi",
     address: "7, Idowu Martins Street, Banana Island, Ikoyi, Lagos",
     coordinates: { lat: 6.4455, lng: 3.4425 },
@@ -240,6 +247,7 @@ export const galleries = [
     id: 6,
     name: "G.A.S. (Guest Artists Space)",
     type: "private-studio",
+    venueType: "Studio", // ADDED for filtering
     neighborhood: "Yaba",
     address: "22, Omotayo Ojo Street, Yaba, Lagos",
     coordinates: { lat: 6.5045, lng: 3.3825 },
@@ -286,6 +294,7 @@ export const galleries = [
     id: 7,
     name: "National Museum Lagos",
     type: "museum",
+    venueType: "Museum", // ADDED for filtering
     neighborhood: "Lagos Island",
     address: "Onikan, Lagos Island, Lagos",
     coordinates: { lat: 6.4435, lng: 3.4055 },
@@ -334,6 +343,7 @@ export const galleries = [
     id: 8,
     name: "Art Twenty One",
     type: "commercial-gallery",
+    venueType: "Gallery", // ADDED for filtering
     neighborhood: "Victoria Island",
     address: "21, Olosa Street, Victoria Island, Lagos",
     coordinates: { lat: 6.4315, lng: 3.4225 },
@@ -378,7 +388,7 @@ export const galleries = [
   },
 ];
 
-
+// Filter options
 export const neighborhoods = [
   "All",
   "Ikoyi",
@@ -389,10 +399,4 @@ export const neighborhoods = [
   "Surulere",
 ];
 
-export const artTypes = [
-  "All",
-  "Labels Gallery",
-  "Studio",
-  "Museum",
-  "Art centre"
-];
+export const artTypes = ["All", "Gallery", "Studio", "Museum", "Art center"];

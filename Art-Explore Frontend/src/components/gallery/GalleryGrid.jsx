@@ -1,3 +1,4 @@
+// src/components/gallery/GalleryGrid.jsx
 import { useState } from "react";
 import GalleryCard from "./GalleryCard";
 import GalleryModal from "./GalleryModal";
@@ -21,14 +22,15 @@ export default function GalleryGrid({ galleries }) {
 
   return (
     <>
-      <section className="gallery-grid-section">
+      <section id="galleries" className="gallery-grid-section">
         <div className="container">
           <div className="section-header">
             <h2 className="grid-header">
               All <span className="artspan">Art Galleries</span> in Lagos
             </h2>
             <p>
-              Discover 20+ galleries, museums, and art spaces across the city
+              Discover {galleries.length} galleries, museums, and art spaces
+              across the city
             </p>
           </div>
 

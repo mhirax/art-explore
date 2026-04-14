@@ -1,45 +1,50 @@
-import { useState, useMemo } from "react";
+// src/App.jsx
+import { useState, useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/layout/Hero";
-import LagosMap from "./components/map/LagosMap";
+import MapView from "./components/map/MapView.jsx";
+import Mapheader from "./components/map/LagosMap";
 import GalleryGrid from "./components/gallery/GalleryGrid";
-import MapView from "./components/map/MapView";
 import FilterSidebar from "./components/filter/FilterSidebar";
 import { galleries } from "./data/galleries";
 import "./App.scss";
+import { Import } from "lucide-react";
 
 function App() {
   const [filteredGalleries, setFilteredGalleries] = useState(galleries);
   const [activeFilters, setActiveFilters] = useState({});
 
-  // ADD THIS - State for map region view (fixes the setViewRegion error)
-  const [viewRegion, setViewRegion] = useState("All");
-
-  const handleFilter = (filters) => {
-    setActiveFilters(filters);
+  // Apply filters whenever activeFilters changes
+  useEffect(() => {
     let filtered = [...galleries];
 
-    if (filters.neighborhood) {
+    // Filter by neighborhood/location
+    if (activeFilters.neighborhood) {
       filtered = filtered.filter(
-        (g) => g.neighborhood === filters.neighborhood,
+        (gallery) => gallery.neighborhood === activeFilters.neighborhood,
       );
     }
 
-    if (filters.artType) {
-      filtered = filtered.filter((g) =>
-        g.artTypes.includes(filters.artType.toLowerCase()),
+    // Filter by venue type (Gallery, Studio, Museum, Art center)
+    if (activeFilters.artType) {
+      filtered = filtered.filter(
+        (gallery) => gallery.venueType === activeFilters.artType,
       );
     }
 
     setFilteredGalleries(filtered);
+  }, [activeFilters]);
+
+  const handleFilter = (filters) => {
+    setActiveFilters(filters);
   };
 
   const handleNearMe = (location) => {
-    // For MVP, just show a message - in production, calculate distances
     alert(
       `Showing galleries near your location (${location.lat}, ${location.lng})\nFull geolocation feature coming soon!`,
     );
-    // Reset to show all galleries
+    // Reset filters when using "Near Me"
+    setActiveFilters({});
     setFilteredGalleries(galleries);
   };
 
@@ -47,33 +52,15 @@ function App() {
     <div className="app">
       <Navbar />
       <Hero />
-      <LagosMap region={viewRegion} />
-      {/* REGION BUTTONS - These now work with setViewRegion */}
-      <div className="region-buttons">
-        <button
-          className={viewRegion === "All" ? "active" : ""}
-          onClick={() => setViewRegion("All")}
-        >
-          All REGION
-        </button>
-        <button
-          className={viewRegion === "Island" ? "active" : ""}
-          onClick={() => setViewRegion("Island")}
-        >
-          ISLAND
-        </button>
-        <button
-          className={viewRegion === "Mainland" ? "active" : ""}
-          onClick={() => setViewRegion("Mainland")}
-        >
-          MAINLAND
-        </button>
+      <Mapheader />
+      <MapView />
+      <div className="main-content">
+        <mapheader />
+        <div className="container">
+          <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
+          <GalleryGrid galleries={filteredGalleries} />
+        </div>
       </div>
-
-      <MapView region={viewRegion} />
-
-      <GalleryGrid galleries={filteredGalleries} />
-      <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
 
       <footer className="footer">
         <div className="container">
