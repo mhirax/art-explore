@@ -15,9 +15,14 @@ const MapView = () => {
   useEffect(() => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "https://tiles.openfreemap.org/styles/positron",
       center: [3.3792, 6.5244],
-      zoom: 11,
+      zoom: 12,
+      // ===== NEW: Lock viewport to Lagos gallery zone =====
+      maxBounds: [
+        [3.2, 6.35], // Southwest corner [lng, lat]
+        [3.65, 6.65], // Northeast corner [lng, lat]
+      ],
     });
 
     mapRef.current = map;
