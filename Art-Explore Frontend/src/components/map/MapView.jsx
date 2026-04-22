@@ -25,8 +25,7 @@ const MapView = () => {
     // ===== NEW: Create custom marker element =====
     const markerElement = document.createElement("div");
     markerElement.className = "gallery-marker";
-    markerElement.innerHTML = "🎨";
-    // =============================================
+    markerElement.innerHTML = `🌴`;
 
     // Create markers and store them
     const markers = galleries.map((gallery) => {
@@ -41,12 +40,17 @@ const MapView = () => {
           ),
         )
         .addTo(map);
-      // ====================================================
 
+      
       return { marker, region: gallery.region };
     });
-
     markersRef.current = markers;
+
+    //CALL BOUND TO MAKE ALL MARKER VISIBLE AT FIRST GLANCE
+    const bounds = new maplibregl.LngLatBounds();
+    galleries.forEach((gallery) => bounds.extend([gallery.lng, gallery.lat]));
+    map.fitBounds(bounds, { padding: 60, duration: 1000 });
+
 
     return () => map.remove();
   }, []);
