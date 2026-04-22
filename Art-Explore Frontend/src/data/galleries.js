@@ -388,6 +388,8 @@ export const galleries = [
   },
 ];
 
+
+
 // Filter options
 export const neighborhoods = [
   "All",
