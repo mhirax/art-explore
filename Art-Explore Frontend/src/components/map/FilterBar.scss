@@ -1,0 +1,32 @@
+.filter-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 10;
+}
+
+.filter-btn {
+  padding: 0.6rem 1.8rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  &.active {
+    background: #ff6b35;
+    color: white;
+    border-color: #ff6b35;
+  }
+}
