@@ -22,6 +22,20 @@ const MapView = () => {
 
     mapRef.current = map;
 
+    //debug
+    const markers = galleries.map((gallery) => {
+      console.log(gallery.name, "lng:", gallery.lng, "lat:", gallery.lat);
+
+      const marker = new maplibregl.Marker().setLngLat([
+        gallery.lng,
+        gallery.lat,
+      ]);
+      // ... rest
+    });
+
+
+
+
     // Create markers and store them
     const markers = galleries.map((gallery) => {
       const marker = new maplibregl.Marker()
