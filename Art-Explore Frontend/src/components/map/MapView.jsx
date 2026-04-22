@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { galleries } from '../../data/MapViewData';
 import "./MapView.scss";
 
 const MapView = () => {
