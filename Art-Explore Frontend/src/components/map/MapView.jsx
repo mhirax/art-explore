@@ -10,18 +10,19 @@ const MapView = () => {
   useEffect(() => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: 'https://demotiles.maplibre.org/style.json',
+      style: "https://demotiles.maplibre.org/style.json",
       center: [3.3792, 6.5244],
-      zoom: 11
+      zoom: 11,
     });
 
-    // Data-driven markers
+    // render markers dynamically from galleries data
     galleries.forEach((gallery) => {
       new maplibregl.Marker()
         .setLngLat([gallery.lng, gallery.lat])
         .setPopup(
-          new maplibregl.Popup({ offset: 25 })
-            .setHTML(`<h4>${gallery.name}</h4><p>${gallery.address}</p>`)
+          new maplibregl.Popup({ offset: 25 }).setHTML(
+            `<h4>${gallery.name}</h4><p>${gallery.address}</p>`,
+          ),
         )
         .addTo(map);
     });
