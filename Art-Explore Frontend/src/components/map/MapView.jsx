@@ -35,13 +35,19 @@ const MapView = () => {
       })
         .setLngLat([gallery.lng, gallery.lat])
         .setPopup(
-          new maplibregl.Popup({ offset: 25 }).setHTML(
-            `<h4>${gallery.name}</h4><p>${gallery.address}</p>`,
-          ),
+          new maplibregl.Popup({ offset: 25, maxWidth: "280px" }).setHTML(`
+    <div class="popup-content">
+      <img src="${gallery.image}" alt="${gallery.name}" class="popup-image" />
+      <div class="popup-text">
+        <h4>${gallery.name}</h4>
+        <p>${gallery.address}</p>
+      </div>
+    </div>
+  `),
         )
+
         .addTo(map);
 
-      
       return { marker, region: gallery.region };
     });
     markersRef.current = markers;
@@ -50,7 +56,6 @@ const MapView = () => {
     const bounds = new maplibregl.LngLatBounds();
     galleries.forEach((gallery) => bounds.extend([gallery.lng, gallery.lat]));
     map.fitBounds(bounds, { padding: 60, duration: 1000 });
-
 
     return () => map.remove();
   }, []);
