@@ -55,7 +55,7 @@ function App() {
       <Mapheader />
       <MapView />
       <div className="main-content">
-        <mapheader />
+      
         <div className="container">
           <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
           <GalleryGrid galleries={filteredGalleries} />

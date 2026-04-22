@@ -29,6 +29,9 @@ const MapView = () => {
 
     return () => map.remove();
   }, []);
-};
+
+  //fix: change ref from mapContainer.current to mapContainer to resolve container error
+  return <div ref={mapContainer} className="map-container" />;
+};;
 
 export default MapView;
