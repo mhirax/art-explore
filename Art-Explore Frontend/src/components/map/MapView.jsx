@@ -13,6 +13,11 @@ const MapView = () => {
       center: [3.3792, 6.5244], // Lagos [lng, lat]
       zoom: 11,
     });
+      
+       // 👇 ADD NIKE MARKER RIGHT HERE
+  new maplibregl.Marker()
+    .setLngLat([3.4479, 6.4563])
+    .addTo(map);
 
     return () => map.remove();
   }, []);
