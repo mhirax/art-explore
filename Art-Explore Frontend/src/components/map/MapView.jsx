@@ -23,6 +23,7 @@ const MapView = () => {
         [3.2, 6.35], // Southwest corner [lng, lat]
         [3.65, 6.65], // Northeast corner [lng, lat]
       ],
+      minZoom: 9,
     });
 
     mapRef.current = map;
@@ -61,6 +62,67 @@ const MapView = () => {
     const bounds = new maplibregl.LngLatBounds();
     galleries.forEach((gallery) => bounds.extend([gallery.lng, gallery.lat]));
     map.fitBounds(bounds, { padding: 60, duration: 1000 });
+
+    // ===== NEW: Region color zoning overlays =====
+    map.on("load", () => {
+      // Island region (Lekki, VI, Ikoyi) - Cool blue tint
+      map.addSource("island-region", {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [
+              [
+                [3.3, 6.4], // Southwest
+                [3.55, 6.4], // Southeast
+                [3.55, 6.52], // Northeast (covers Lekki)
+                [3.3, 6.52], // Northwest
+              ],
+            ],
+          },
+        },
+      });
+
+      map.addLayer({
+        id: "island-overlay",
+        type: "fill",
+        source: "island-region",
+        paint: {
+          "fill-color": "#3b82f6", // Cool blue
+          "fill-opacity": 0.08,
+        },
+      });
+
+      // Mainland region (Ikeja, Yaba, Surulere) - Warm earth tint
+      map.addSource("mainland-region", {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [
+              [
+                [3.2, 6.45], // Southwest
+                [3.45, 6.45], // Southeast
+                [3.45, 6.65], // Northeast (covers Ikeja)
+                [3.2, 6.65], // Northwest
+              ],
+            ],
+          },
+        },
+      });
+
+      map.addLayer({
+        id: "mainland-overlay",
+        type: "fill",
+        source: "mainland-region",
+        paint: {
+          "fill-color": "#f59e0b", // Warm amber
+          "fill-opacity": 0.08,
+        },
+      });
+    });
 
     return () => map.remove();
   }, []);
