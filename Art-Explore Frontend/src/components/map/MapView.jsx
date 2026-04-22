@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.scss";
-import { galleries } from "../../data/galleries";
+import { galleries } from "../../data/MapViewData";
 import FilterBar from "./FilterBar";
 
 const MapView = () => {
@@ -22,23 +22,18 @@ const MapView = () => {
 
     mapRef.current = map;
 
-    //debug
-    const markers = galleries.map((gallery) => {
-      console.log(gallery.name, "lng:", gallery.lng, "lat:", gallery.lat);
-
-      const marker = new maplibregl.Marker().setLngLat([
-        gallery.lng,
-        gallery.lat,
-      ]);
-      // ... rest
-    });
-
-
-
+    // ===== NEW: Create custom marker element =====
+    const markerElement = document.createElement("div");
+    markerElement.className = "gallery-marker";
+    markerElement.innerHTML = "🎨";
+    // =============================================
 
     // Create markers and store them
     const markers = galleries.map((gallery) => {
-      const marker = new maplibregl.Marker()
+      // ===== CHANGED: Use custom element with cloneNode =====
+      const marker = new maplibregl.Marker({
+        element: markerElement.cloneNode(true),
+      })
         .setLngLat([gallery.lng, gallery.lat])
         .setPopup(
           new maplibregl.Popup({ offset: 25 }).setHTML(
@@ -46,6 +41,7 @@ const MapView = () => {
           ),
         )
         .addTo(map);
+      // ====================================================
 
       return { marker, region: gallery.region };
     });
