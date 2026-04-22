@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/layout/Hero";
-import MapView from "./components/map/MapView.jsx";
-import Mapheader from "./components/map/LagosMap";
+import Mapheader from "./components/Map/LagosMap.jsx";
 import GalleryGrid from "./components/gallery/GalleryGrid";
 import FilterSidebar from "./components/filter/FilterSidebar";
 import { galleries } from "./data/galleries";
@@ -53,7 +52,7 @@ function App() {
       <Navbar />
       <Hero />
       <Mapheader />
-      <MapView />
+     
       <div className="main-content">
         <mapheader />
         <div className="container">
