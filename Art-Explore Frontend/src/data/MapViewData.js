@@ -116,7 +116,7 @@ export const galleries = [
     lat: 6.5815,
     region: "Mainland",
     image:
-      "https://travellemming.com/wp-content/uploads/Kalakuta-Republic-Museum-1024x576.jpg",
+      "https://d1rgjmn2wmqeif.cloudfront.net/extra/b/HomePageModule-40923-95830.jpg",
   },
   {
     id: 13,
