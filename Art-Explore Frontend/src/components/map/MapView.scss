@@ -1,13 +1,22 @@
 .map-wrapper {
-  height: 88vh; // Not full height anymore
+  height: 90vh;
   width: 100%;
-  max-width: 1400px; // Keeps it contained on big screens
-  margin: 0 auto; // Centers the whole thing
+  max-width: 1400px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  @media (max-width: 768px) {
+    height: 80vh;
+    border-radius: 16px;
+  }
+
+  @media (max-width: 480px) {
+    height: 70vh;
+    border-radius: 12px;
+  }
 }
 
 .map-container {
@@ -15,31 +24,24 @@
   width: 100%;
 }
 
-// ===== NEW: Custom bold marker styles =====
-.gallery-marker {
-  width: 57px;
-  height: 57px;
-  background: #ae7c66;
-  border: 3px solid white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  
-  &:hover {
-    transform: scale(1.15);
+// Popup styles
+.maplibregl-popup {
+  max-width: 280px !important;
+
+  @media (max-width: 480px) {
+    max-width: 240px !important;
   }
 }
 
-// ===== NEW: Popup image styles =====
 .popup-content {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 220px;
+  min-width: 200px;
+
+  @media (max-width: 480px) {
+    min-width: 160px;
+  }
 }
 
 .popup-image {
@@ -47,6 +49,10 @@
   height: 120px;
   object-fit: cover;
   border-radius: 8px;
+
+  @media (max-width: 480px) {
+    height: 100px;
+  }
 }
 
 .popup-text {
@@ -55,6 +61,10 @@
     font-size: 16px;
     font-weight: 600;
     color: #1a1a1a;
+
+    @media (max-width: 480px) {
+      font-size: 14px;
+    }
   }
 
   p {
@@ -62,5 +72,32 @@
     font-size: 13px;
     color: #666;
     line-height: 1.4;
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+    }
+  }
+}
+
+// Red pin marker with glow
+.gallery-marker {
+  width: 52px;
+  height: 52px;
+  cursor: pointer;
+  
+  transition: transform 0.2s ease, filter 0.2s ease;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  &:hover {
+    transform: scale(1.15);
+  }
+
+  @media (max-width: 480px) {
+    width: 44px;
+    height: 44px;
   }
 }
