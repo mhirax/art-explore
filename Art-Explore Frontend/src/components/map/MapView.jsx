@@ -14,9 +14,10 @@ const MapView = () => {
   useEffect(() => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://tiles.openfreemap.org/styles/bright",
+      style:
+        "https://api.maptiler.com/maps/streets-v4/style.json?key=eBsT19HyOExrdi0WUD3x",
       center: [3.3792, 6.5244],
-      zoom: 11,
+      zoom: 12,
       maxBounds: [
         [3.15, 6.3],
         [3.7, 6.7],
@@ -116,7 +117,7 @@ const MapView = () => {
         type: "fill",
         source: "island-region",
         paint: {
-          "fill-color": "#3b82f6",
+          "fill-color": "#0c50bd",
           "fill-opacity": 0.06,
         },
       });
@@ -145,7 +146,7 @@ const MapView = () => {
         type: "fill",
         source: "mainland-region",
         paint: {
-          "fill-color": "#f59e0b",
+          "fill-color": "#654918",
           "fill-opacity": 0.06,
         },
       });
@@ -161,7 +162,7 @@ const MapView = () => {
           "text-anchor": "center",
         },
         paint: {
-          "text-color": "#3b82f6",
+          "text-color": "#2e5aa1",
           "text-halo-color": "white",
           "text-halo-width": 2,
         },
