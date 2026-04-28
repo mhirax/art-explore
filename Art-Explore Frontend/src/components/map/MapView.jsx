@@ -15,9 +15,9 @@ const MapView = () => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style:
-        "https://api.maptiler.com/maps/streets-v4/style.json?key=eBsT19HyOExrdi0WUD3x",
+        "https://api.maptiler.com/maps/base-v4/style.json?key=eBsT19HyOExrdi0WUD3x",
       center: [3.3792, 6.5244],
-      zoom: 12,
+      zoom: 7,
       maxBounds: [
         [3.15, 6.3],
         [3.7, 6.7],
@@ -86,10 +86,6 @@ const MapView = () => {
       duration: 1000,
     });
 
-    // Force pan to exact center after fitting
-    map.once("moveend", () => {
-      map.panTo([centerLng, centerLat], { duration: 500 });
-    });
 
     // Region color zoning
     map.on("load", () => {
@@ -226,13 +222,8 @@ const MapView = () => {
         maxZoom: 10,
         duration: 800,
       });
-
-      mapRef.current.once("moveend", () => {
-        mapRef.current.panTo([centerLng, centerLat], { duration: 400 });
-      });
     }
   }, [activeRegion]);
-  // ======================================================================
 
   return (
     <div className="map-wrapper">
