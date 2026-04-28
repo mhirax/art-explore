@@ -61,6 +61,17 @@ const MapView = () => {
         )
         .addTo(map);
 
+      // ===== NEW: Fly to street-level zoom when marker is clicked =====
+      marker.getElement().addEventListener("click", () => {
+        map.flyTo({
+          center: [gallery.lng, gallery.lat],
+          zoom: 16, // Street-level detail
+          speed: 1.5, // Faster animation
+          duration: 1500, // 1.5 second flight
+        });
+      });
+      // ===============================================================
+
       return { marker, region: gallery.region };
     });
 
@@ -85,7 +96,6 @@ const MapView = () => {
       maxZoom: 10,
       duration: 1000,
     });
-
 
     // Region color zoning
     map.on("load", () => {
@@ -184,7 +194,7 @@ const MapView = () => {
     return () => map.remove();
   }, []);
 
-  // ===== UPDATED: Filter markers AND re-center map on filter change =====
+  // Handle filter changes
   useEffect(() => {
     if (!markersRef.current.length) return;
 
