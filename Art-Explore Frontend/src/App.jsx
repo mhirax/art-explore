@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/layout/Hero";
+import ArtGalleryApp from "./ArtGalleryApp";
 import Mapheader from "./components/Map/LagosMap.jsx";
 import MapView from "./components/Map/MapView";
 import GalleryGrid from "./components/gallery/GalleryGrid";
