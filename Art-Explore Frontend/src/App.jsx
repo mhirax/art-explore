@@ -5,60 +5,96 @@ import Hero from "./components/layout/Hero";
 import Mapheader from "./components/Map/LagosMap.jsx";
 import MapView from "./components/Map/MapView";
 import GalleryGrid from "./components/gallery/GalleryGrid";
+import GalleryModal from "./components/gallery/GalleryModal";
 import FilterSidebar from "./components/filter/FilterSidebar";
 import { galleries } from "./data/galleries";
 import "./App.scss";
-import { Import } from "lucide-react";
 
 function App() {
   const [filteredGalleries, setFilteredGalleries] = useState(galleries);
   const [activeFilters, setActiveFilters] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGallery, setSelectedGallery] = useState(null);
 
-  // Apply filters whenever activeFilters changes
   useEffect(() => {
     let filtered = [...galleries];
 
-    // Filter by neighborhood/location
-    if (activeFilters.neighborhood) {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (gallery) => gallery.neighborhood === activeFilters.neighborhood,
+        (g) =>
+          g.name.toLowerCase().includes(q) ||
+          g.neighborhood.toLowerCase().includes(q) ||
+          g.description.toLowerCase().includes(q) ||
+          g.artTypes.some((t) => t.toLowerCase().includes(q))
       );
     }
 
-    // Filter by venue type (Gallery, Studio, Museum, Art center)
-    if (activeFilters.artType) {
+    if (activeFilters.neighborhood) {
       filtered = filtered.filter(
-        (gallery) => gallery.venueType === activeFilters.artType,
+        (g) => g.neighborhood === activeFilters.neighborhood
       );
+    }
+
+    if (activeFilters.artType) {
+      filtered = filtered.filter((g) => g.venueType === activeFilters.artType);
     }
 
     setFilteredGalleries(filtered);
-  }, [activeFilters]);
+  }, [activeFilters, searchQuery]);
 
   const handleFilter = (filters) => {
     setActiveFilters(filters);
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  const handleCategoryFilter = (venueType) => {
+    setActiveFilters((prev) => ({
+      ...prev,
+      artType: venueType || undefined,
+    }));
+  };
+
   const handleNearMe = (location) => {
     alert(
-      `Showing galleries near your location (${location.lat}, ${location.lng})\nFull geolocation feature coming soon!`,
+      `Showing galleries near your location (${location.lat}, ${location.lng})\nFull geolocation feature coming soon!`
     );
-    // Reset filters when using "Near Me"
     setActiveFilters({});
+    setSearchQuery("");
     setFilteredGalleries(galleries);
+  };
+
+  const openGallery = (gallery) => {
+    setSelectedGallery(gallery);
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeGallery = () => {
+    setSelectedGallery(null);
+    document.body.style.overflow = "unset";
   };
 
   return (
     <div className="app">
       <Navbar />
-      <Hero />
+      <Hero
+        galleries={galleries}
+        onSearch={handleSearch}
+        onSurprise={openGallery}
+        onCategoryFilter={handleCategoryFilter}
+      />
       <Mapheader />
       <MapView />
       <div className="main-content">
-      
         <div className="container">
           <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
-          <GalleryGrid galleries={filteredGalleries} />
+          <GalleryGrid
+            galleries={filteredGalleries}
+            onOpenGallery={openGallery}
+          />
         </div>
       </div>
 
@@ -70,6 +106,10 @@ function App() {
           </small>
         </div>
       </footer>
+
+      {selectedGallery && (
+        <GalleryModal gallery={selectedGallery} onClose={closeGallery} />
+      )}
     </div>
   );
 }
