@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/layout/Hero";
-import ArtGalleryApp from "./ArtGalleryApp";
+import ArtGalleryApp from "./components/gallery/ArtGalleryApp.jsx";
 import Mapheader from "./components/Map/LagosMap.jsx";
 import MapView from "./components/Map/MapView";
 import GalleryGrid from "./components/gallery/GalleryGrid";
@@ -27,13 +27,13 @@ function App() {
           g.name.toLowerCase().includes(q) ||
           g.neighborhood.toLowerCase().includes(q) ||
           g.description.toLowerCase().includes(q) ||
-          g.artTypes.some((t) => t.toLowerCase().includes(q))
+          g.artTypes.some((t) => t.toLowerCase().includes(q)),
       );
     }
 
     if (activeFilters.neighborhood) {
       filtered = filtered.filter(
-        (g) => g.neighborhood === activeFilters.neighborhood
+        (g) => g.neighborhood === activeFilters.neighborhood,
       );
     }
 
@@ -61,7 +61,7 @@ function App() {
 
   const handleNearMe = (location) => {
     alert(
-      `Showing galleries near your location (${location.lat}, ${location.lng})\nFull geolocation feature coming soon!`
+      `Showing galleries near your location (${location.lat}, ${location.lng})\nFull geolocation feature coming soon!`,
     );
     setActiveFilters({});
     setSearchQuery("");
@@ -81,15 +81,24 @@ function App() {
   return (
     <div className="app">
       <Navbar />
+
       <Hero
         galleries={galleries}
         onSearch={handleSearch}
         onSurprise={openGallery}
         onCategoryFilter={handleCategoryFilter}
       />
+
       <Mapheader />
+
+      {/* ===== MapView spans full width — no container wrapper ===== */}
       <MapView />
-      <div className="main-content">
+      {/* ============================================================ */}
+
+      <ArtGalleryApp />
+
+      {/* ===== Main content in contained wrapper ===== */}
+      <div className="main-content section--contained">
         <div className="container">
           <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
           <GalleryGrid
@@ -98,6 +107,7 @@ function App() {
           />
         </div>
       </div>
+      {/* ============================================= */}
 
       <footer className="footer">
         <div className="container">
