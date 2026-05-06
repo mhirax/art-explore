@@ -2,27 +2,9 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import "./ArtGalleryApp.scss";
+import { GALLERIES } from "../data/galleries";  // ← imported from separate file
 
-// ─── Mock Data ────────────────────────────────────────────────
-const H = new Date().getHours();
-const OPEN_NOW   = Array(7).fill({ open: `${H - 1}:00`, close: `${H + 3}:00` });
-const CLOSED_NOW = Array(7).fill({ open: "09:00", close: "10:00" });
-
-const GALLERIES = [
-  { id: 1,  name: "Lagos Contemporary",        neighborhood: "Victoria Island", artTypes: ["gallery", "exhibition"], hours: OPEN_NOW,   rating: 4.8 },
-  { id: 2,  name: "Terra Kulture",              neighborhood: "Victoria Island", artTypes: ["gallery", "events"],     hours: OPEN_NOW,   rating: 4.6 },
-  { id: 3,  name: "Nike Art Gallery",           neighborhood: "Lekki",           artTypes: ["gallery", "artists"],    hours: OPEN_NOW,   rating: 4.9 },
-  { id: 4,  name: "Rele Gallery",               neighborhood: "Ikoyi",           artTypes: ["gallery", "exhibition"], hours: CLOSED_NOW, rating: 4.5 },
-  { id: 5,  name: "Signature Beyond Art",       neighborhood: "Lekki",           artTypes: ["exhibition", "events"],  hours: OPEN_NOW,   rating: 3.9 },
-  { id: 6,  name: "Omenka Gallery",             neighborhood: "Ikoyi",           artTypes: ["gallery", "artists"],    hours: CLOSED_NOW, rating: 4.3 },
-  { id: 7,  name: "Mydrim Gallery",             neighborhood: "Ikoyi",           artTypes: ["gallery", "exhibition"], hours: OPEN_NOW,   rating: 4.1 },
-  { id: 8,  name: "WhiteSpace Lagos",           neighborhood: "Victoria Island", artTypes: ["events", "exhibition"],  hours: OPEN_NOW,   rating: 4.7 },
-  { id: 9,  name: "African Artists Foundation", neighborhood: "Lagos Island",    artTypes: ["artists", "events"],     hours: OPEN_NOW,   rating: 4.4 },
-  { id: 10, name: "Genesis Art Gallery",        neighborhood: "Marina",          artTypes: ["gallery", "artists"],    hours: CLOSED_NOW, rating: 3.8 },
-  { id: 11, name: "Eko Gallery",                neighborhood: "Apapa",           artTypes: ["events", "gallery"],     hours: OPEN_NOW,   rating: 3.6 },
-  { id: 12, name: "Retro Frames",               neighborhood: "Surulere",        artTypes: ["gallery", "exhibition"], hours: CLOSED_NOW, rating: 4.2 },
-];
-
+// ─── Tabs & Sort (kept here as UI config, not data) ───────────
 const TABS = [
   { id: "all",         label: "All",         matchTypes: null                             },
   { id: "galleries",   label: "Galleries",   matchTypes: ["gallery"]                      },
@@ -302,10 +284,7 @@ export default function ArtGalleryApp() {
   const F = useGalleryFilters(GALLERIES);
 
   return (
-    <div className="app">
-      <nav className="app__breadcrumb">
-        <a href="/" className="app__breadcrumb-link">Home</a>
-      </nav>
+    <div className="galleries">
 
       <header className="app__hero">
         <h1 className="app__title">Search</h1>

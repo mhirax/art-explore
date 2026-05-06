@@ -32,33 +32,12 @@ img {
   display: block;
 }
 
-// ===== NEW: Section wrapper so each component controls its own width =====
-.app {
-  display: flex;
-  flex-direction: column;
-}
-
-.section {
-  width: 100%;
-  
-  &--contained {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  
-//   &--full {
-//     // Spans full width — map uses this
-//   }
-// }
-// ========================================================================
-
-// Container — only for sections that need it
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 20px;
 }
+
+
 
 // Buttons
 .btn {
@@ -199,5 +178,4 @@ img {
       font-size: 0.875rem;
     }
   }
-}
 }

@@ -5,11 +5,10 @@ import Hero from "./components/layout/Hero";
 import ArtGalleryApp from "./components/gallery/ArtGalleryApp.jsx";
 import Mapheader from "./components/Map/LagosMap.jsx";
 import MapView from "./components/Map/MapView";
-import GalleryGrid from "./components/gallery/GalleryGrid";
-import GalleryModal from "./components/gallery/GalleryModal";
-import FilterSidebar from "./components/filter/FilterSidebar";
-import { galleries } from "./data/galleries";
+
+import { GALLERIES } from "./components/data/galleries.js";
 import "./App.scss";
+import { galleries } from "./data/MapViewData.js";
 
 function App() {
   const [filteredGalleries, setFilteredGalleries] = useState(galleries);
@@ -27,13 +26,13 @@ function App() {
           g.name.toLowerCase().includes(q) ||
           g.neighborhood.toLowerCase().includes(q) ||
           g.description.toLowerCase().includes(q) ||
-          g.artTypes.some((t) => t.toLowerCase().includes(q)),
+          g.artTypes.some((t) => t.toLowerCase().includes(q))
       );
     }
 
     if (activeFilters.neighborhood) {
       filtered = filtered.filter(
-        (g) => g.neighborhood === activeFilters.neighborhood,
+        (g) => g.neighborhood === activeFilters.neighborhood
       );
     }
 
@@ -61,7 +60,7 @@ function App() {
 
   const handleNearMe = (location) => {
     alert(
-      `Showing galleries near your location (${location.lat}, ${location.lng})\nFull geolocation feature coming soon!`,
+      `Showing galleries near your location (${location.lat}, ${location.lng})\nFull geolocation feature coming soon!`
     );
     setActiveFilters({});
     setSearchQuery("");
@@ -81,33 +80,21 @@ function App() {
   return (
     <div className="app">
       <Navbar />
-
       <Hero
         galleries={galleries}
         onSearch={handleSearch}
         onSurprise={openGallery}
         onCategoryFilter={handleCategoryFilter}
       />
-
       <Mapheader />
 
-      {/* ===== MapView spans full width — no container wrapper ===== */}
       <MapView />
-      {/* ============================================================ */}
-
       <ArtGalleryApp />
-
-      {/* ===== Main content in contained wrapper ===== */}
-      <div className="main-content section--contained">
+      <div className="main-content">
         <div className="container">
-          <FilterSidebar onFilter={handleFilter} onNearMe={handleNearMe} />
-          <GalleryGrid
-            galleries={filteredGalleries}
-            onOpenGallery={openGallery}
-          />
+         
         </div>
       </div>
-      {/* ============================================= */}
 
       <footer className="footer">
         <div className="container">
