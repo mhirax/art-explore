@@ -233,7 +233,7 @@ function FilterRow({ nearMe, toggleNearMe, openNow, toggleOpenNow, topRated, tog
 function GalleryCard({ gallery }) {
   const open = isOpenNow(gallery.hours);
   return (
-    <div className="card">
+    <div className="gallery-card">
       <div className="card__thumb" style={{ backgroundColor: placeholderColor(gallery.name) }}>
         {gallery.image
           ? <img src={gallery.image} alt={gallery.name} className="card__img" />
