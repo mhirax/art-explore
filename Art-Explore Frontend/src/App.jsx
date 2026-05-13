@@ -1,7 +1,6 @@
 // src/App.jsx
 import { useState, useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
-// import Hero from "./components/layout/Hero";
 import Carousel from "./components/layout/Carousel.jsx";
 import ArtGalleryApp from "./components/gallery/ArtGalleryApp.jsx";
 import Mapheader from "./components/Map/LagosMap.jsx";
@@ -16,6 +15,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGallery, setSelectedGallery] = useState(null);
 
+  // Filter galleries whenever active filters or search query changes
   useEffect(() => {
     let filtered = [...galleries];
 

@@ -63,7 +63,13 @@ function Card({ item, isActive, onActivate }) {
           tabIndex={isActive ? 0 : -1}
         >
           Explore
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 13 13"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               d="M2.5 6.5h8M7 3l3.5 3.5L7 10"
               stroke="currentColor"
@@ -86,10 +92,14 @@ export default function Carousel() {
   }, []);
 
   return (
-    <section className="carousel" role="region" aria-label="Art spaces collection">
+    <section
+      className="carousel"
+      role="region"
+      aria-label="Art spaces collection"
+    >
       <header className="carousel__header">
         <p className="carousel__eyebrow">Explore art galleries in lagos</p>
-        <h2 className="carousel__title">Step inside the Collection</h2>
+        <h2 className="carousel__title">journey through the Collection</h2>
       </header>
 
       <div className="carousel__stage" role="list">
