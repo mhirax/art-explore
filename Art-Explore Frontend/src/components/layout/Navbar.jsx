@@ -5,33 +5,22 @@ import "./Navbar.scss";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // ============================================================
-  // ✅ NEW FUNCTION: Handles smooth scrolling to any section
-  // ============================================================
   const scrollToSection = (sectionId) => {
-    // 1. Find the element on the page using its ID
     const section = document.getElementById(sectionId);
     
-    // 2. If the element exists, scroll to it
     if (section) {
-      // Get navbar height to offset the scroll (so content doesn't hide behind navbar)
       const navbar = document.querySelector('.navbar');
       const navbarHeight = navbar ? navbar.offsetHeight : 70;
       
-      // Calculate where to scroll (element position minus navbar height)
       const sectionPosition = section.offsetTop - navbarHeight;
-      
-      // Tell browser to scroll smoothly to that position
-      window.scrollTo({
+            window.scrollTo({
         top: sectionPosition,
-        behavior: 'smooth'  // This creates the smooth animation
+        behavior: 'smooth'  
       });
       
-      // 3. Close mobile menu if it's open (better user experience)
       setIsMenuOpen(false);
     }
   };
-  // ============================================================
 
   return (
     <nav className="navbar">
@@ -41,8 +30,8 @@ export default function Navbar() {
           href="#home" 
           className="logo"
           onClick={(e) => {
-            e.preventDefault();  // ✅ Prevents default jump behavior
-            scrollToSection("home");  // ✅ Calls our smooth scroll function
+            e.preventDefault();  
+            scrollToSection("home");  
           }}
         >
           Art<span className="explore">Explore</span>
@@ -63,8 +52,8 @@ export default function Navbar() {
             <a
               href="#home"
               onClick={(e) => {
-                e.preventDefault();     // ✅ Stop default jump
-                scrollToSection("home"); // ✅ Smooth scroll to hero
+                e.preventDefault();     
+                scrollToSection("home");
               }}
             >
               About
@@ -76,8 +65,8 @@ export default function Navbar() {
             <a
               href="#map"
               onClick={(e) => {
-                e.preventDefault();      // ✅ Stop default jump
-                scrollToSection("map");   // ✅ Smooth scroll to map
+                e.preventDefault();    
+                scrollToSection("map");   
               }}
             >
               Map
@@ -89,8 +78,8 @@ export default function Navbar() {
             <a
               href="#galleries"
               onClick={(e) => {
-                e.preventDefault();          // ✅ Stop default jump
-                scrollToSection("galleries"); // ✅ Smooth scroll to galleries
+                e.preventDefault();         
+                scrollToSection("galleries"); 
               }}
             >
               Galleries

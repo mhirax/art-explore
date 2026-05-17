@@ -80,17 +80,10 @@ function App() {
   return (
     <div className="app">
       <Navbar />
-      {/* <Hero
-        galleries={galleries}
-        onSearch={handleSearch}
-        onSurprise={openGallery}
-        onCategoryFilter={handleCategoryFilter}
-      /> */}
       <Carousel />
       <Mapheader />
       <MapView />
       <ArtGalleryApp />
-   
       <footer className="footer">
         <div className="container">
           <p>&copy; 2024 ArtLagos Directory. All rights reserved.</p>
@@ -99,10 +92,6 @@ function App() {
           </small>
         </div>
       </footer>
-
-      {selectedGallery && (
-        <GalleryModal gallery={selectedGallery} onClose={closeGallery} />
-      )}
     </div>
   );
 }

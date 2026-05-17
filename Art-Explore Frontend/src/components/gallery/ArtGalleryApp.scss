@@ -1,11 +1,3 @@
-// ArtGalleryApp.scss
-//
-// Fixed:
-//   1. Tabs — active state is bold + black underline ONLY. No colour change, no background.
-//   2. Tabs — zero hover effects. Clicking just moves the underline, nothing else.
-//   3. Search box — white background always. Never changes.
-
-// ─── Tokens ───────────────────────────────────────────────────
 :root {
   --white:       #ffffff;
   --black:       #000000;
@@ -39,20 +31,11 @@ button {
   appearance: none;
 }
 
-// ─── App Shell ────────────────────────────────────────────────
 .galleries{
   max-width: 1200px;
   margin: 0 auto;
   margin-top: 5rem;
   margin-bottom: 5rem;
-}
-
-.app__breadcrumb { margin-bottom: 20px; }
-
-.app__breadcrumb-link {
-  font-size: 13px;
-  color: var(--grey-text);
-  text-decoration: none;
 }
 
 .app__hero { margin-bottom: 28px; }
@@ -79,8 +62,6 @@ button {
   margin: 0 0 22px;
 }
 
-// ─── Search Box ───────────────────────────────────────────────
-// FIX 3: White background always — on load, on focus, on click, always.
 .search-box {
   display: flex;
   align-items: center;
@@ -132,10 +113,6 @@ button {
   flex-shrink: 0;
 }
 
-// ─── Category Tabs ────────────────────────────────────────────
-// FIX 1 + 2: Active = bold + underline only. Zero hover effects.
-// Text colour stays the same on hover and on click — only the
-// underline indicator moves. That's the only visual feedback.
 .tabs {
   display: flex;
   overflow-x: auto;
@@ -196,7 +173,6 @@ button {
   }
 }
 
-// ─── Filter Row ───────────────────────────────────────────────
 .filter-row {
   display: flex;
   align-items: center;
@@ -219,19 +195,7 @@ button {
   flex-wrap: wrap;
 }
 
-.filter-row__reset {
-  border: none;
-  background: var(--white);
-  font-size: 13px;
-  color: var(--grey-text);
-  text-decoration: underline;
-  padding: 0 4px;
-}
 
-// ─── Chips ────────────────────────────────────────────────────
-// Off: white bg, grey border.
-// On: black bg, white text.
-// No hover, no focus, no active state changes.
 .chip {
   display: inline-flex;
   align-items: center;
@@ -253,8 +217,9 @@ button {
   }
 }
 
-// ─── Sort Dropdown ────────────────────────────────────────────
-.sort { position: relative; }
+.sort { 
+  position: relative;
+ }
 
 .sort__trigger {
   display: flex;
@@ -277,52 +242,21 @@ button {
   &--open { transform: rotate(180deg); }
 }
 
-.sort__menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 4px);
-  z-index: 200;
-  list-style: none;
-  background: var(--white);
-  border: 1px solid var(--border);
-  min-width: 155px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.sort__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 10px 14px;
-  border: none;
-  background: var(--white);
-  font-family: var(--font);
-  font-size: 13px;
-  color: var(--ink);
-  text-align: left;
-
-  &:hover, &:focus, &:active { outline: none; background: var(--white); }
-  &--active { font-weight: 700; }
-}
-
-// ─── Results Grid ─────────────────────────────────────────────
 .results-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 42px 34px;
 }
 
-.empty {
-  padding: 60px 0;
-  border-top: 1px solid var(--border);
-}
+// .empty {
+//   padding: 60px 0;
+//   border-top: 1px solid var(--border);
+// }
 
-.empty__heading { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-.empty__sub     { font-size: 14px; color: var(--grey-text); line-height: 1.5; }
+// .empty__heading { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+// .empty__sub     { font-size: 14px; color: var(--grey-text); line-height: 1.5; }
 
-// ─── Gallery Card ─────────────────────────────────────────────
-.card { cursor: pointer; }
+// .card { cursor: pointer; }
 
 .card__thumb {
   position: relative;
@@ -334,15 +268,18 @@ button {
   overflow: hidden;
 }
 
-.card__img      { width: 100%; height: 100%; object-fit: cover; }
+.card__img { 
+  width: 100%;
+  height: 100%;
+  object-fit: cover; }
 
-.card__initials {
-  font-size: 36px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: -1px;
-  user-select: none;
-}
+// .card__initials {
+//   font-size: 36px;
+//   font-weight: 700;
+//   color: rgba(255, 255, 255, 0.5);
+//   letter-spacing: -1px;
+//   user-select: none;
+// }
 
 .card__status {
   position: absolute;
@@ -353,7 +290,6 @@ button {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-
   &--open   { background: var(--open-bg);   color: var(--open-text);   }
   &--closed { background: var(--closed-bg); color: var(--closed-text); }
 }
@@ -367,6 +303,7 @@ button {
 .card__stars        { display: flex; gap: 1px; }
 .card__star         { font-size: 13px; color: var(--border); &--on { color: var(--star); } }
 .card__rating-value { font-size: 12px; font-weight: 700; color: var(--ink); }
+
 
 // ─── Responsive ───────────────────────────────────────────────
 @media (max-width: 768px) {

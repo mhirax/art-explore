@@ -1,10 +1,6 @@
 import "./LagosMap.scss";
 
 export default function MapSection() {
-  // Lagos, Nigeria coordinates
-  const lagosLat = 6.5244;
-  const lagosLng = 3.3792;
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lagosLng - 0.5}%2C${lagosLat - 0.5}%2C${lagosLng + 0.5}%2C${lagosLat + 0.5}&layer=mapnik&marker=${lagosLat}%2C${lagosLng}`;
 
   return (
     <section className="map-section">

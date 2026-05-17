@@ -3,7 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.scss";
 import { galleries } from "../../data/MapViewData";
-import FilterBar from "./FilterBar";
+
 
 const MapView = () => {
   const mapContainer = useRef(null);
@@ -194,7 +194,6 @@ const MapView = () => {
     return () => map.remove();
   }, []);
 
-  // Handle filter changes
   useEffect(() => {
     if (!markersRef.current.length) return;
 
@@ -237,7 +236,6 @@ const MapView = () => {
 
   return (
     <div className="map-wrapper">
-      <FilterBar activeRegion={activeRegion} onFilterChange={setActiveRegion} />
       <div ref={mapContainer} className="map-container" />
     </div>
   );
