@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.scss";
-import { galleries } from "../../data/MapViewData";
-
+import { GALLERIES } from "../../data/galleries"; // ← single source of truth
 
 const MapView = () => {
   const mapContainer = useRef(null);
@@ -37,8 +36,8 @@ const MapView = () => {
       </svg>
     `;
 
-    // Create all markers
-    const markers = galleries.map((gallery) => {
+    // Create all markers from GALLERIES (merged data)
+    const markers = GALLERIES.map((gallery) => {
       const marker = new maplibregl.Marker({
         element: markerElement.cloneNode(true),
         anchor: "bottom",
@@ -61,16 +60,15 @@ const MapView = () => {
         )
         .addTo(map);
 
-      // ===== NEW: Fly to street-level zoom when marker is clicked =====
+      // Fly to street-level zoom when marker is clicked
       marker.getElement().addEventListener("click", () => {
         map.flyTo({
           center: [gallery.lng, gallery.lat],
-          zoom: 16, // Street-level detail
-          speed: 1.5, // Faster animation
-          duration: 1500, // 1.5 second flight
+          zoom: 16,
+          speed: 1.5,
+          duration: 1500,
         });
       });
-      // ===============================================================
 
       return { marker, region: gallery.region };
     });
@@ -79,20 +77,11 @@ const MapView = () => {
 
     // Calculate bounds from all galleries
     const bounds = new maplibregl.LngLatBounds();
-    galleries.forEach((gallery) => bounds.extend([gallery.lng, gallery.lat]));
-
-    // Calculate center of all markers
-    const centerLng = (bounds.getWest() + bounds.getEast()) / 2;
-    const centerLat = (bounds.getSouth() + bounds.getNorth()) / 2;
+    GALLERIES.forEach((gallery) => bounds.extend([gallery.lng, gallery.lat]));
 
     // Fit map to show all markers
     map.fitBounds(bounds, {
-      padding: {
-        top: 80,
-        bottom: 80,
-        left: 60,
-        right: 60,
-      },
+      padding: { top: 80, bottom: 80, left: 60, right: 60 },
       maxZoom: 10,
       duration: 1000,
     });
@@ -106,26 +95,15 @@ const MapView = () => {
           type: "Feature",
           geometry: {
             type: "Polygon",
-            coordinates: [
-              [
-                [3.3, 6.4],
-                [3.55, 6.4],
-                [3.55, 6.52],
-                [3.3, 6.52],
-              ],
-            ],
+            coordinates: [[[3.3, 6.4], [3.55, 6.4], [3.55, 6.52], [3.3, 6.52]]],
           },
         },
       });
-
       map.addLayer({
         id: "island-overlay",
         type: "fill",
         source: "island-region",
-        paint: {
-          "fill-color": "#0c50bd",
-          "fill-opacity": 0.06,
-        },
+        paint: { "fill-color": "#0c50bd", "fill-opacity": 0.06 },
       });
 
       // Mainland zone
@@ -135,26 +113,15 @@ const MapView = () => {
           type: "Feature",
           geometry: {
             type: "Polygon",
-            coordinates: [
-              [
-                [3.2, 6.45],
-                [3.45, 6.45],
-                [3.45, 6.65],
-                [3.2, 6.65],
-              ],
-            ],
+            coordinates: [[[3.2, 6.45], [3.45, 6.45], [3.45, 6.65], [3.2, 6.65]]],
           },
         },
       });
-
       map.addLayer({
         id: "mainland-overlay",
         type: "fill",
         source: "mainland-region",
-        paint: {
-          "fill-color": "#654918",
-          "fill-opacity": 0.06,
-        },
+        paint: { "fill-color": "#654918", "fill-opacity": 0.06 },
       });
 
       // Region labels
@@ -162,32 +129,15 @@ const MapView = () => {
         id: "island-label",
         type: "symbol",
         source: "island-region",
-        layout: {
-          "text-field": "Island",
-          "text-size": 13,
-          "text-anchor": "center",
-        },
-        paint: {
-          "text-color": "#2e5aa1",
-          "text-halo-color": "white",
-          "text-halo-width": 2,
-        },
+        layout: { "text-field": "Island", "text-size": 13, "text-anchor": "center" },
+        paint: { "text-color": "#2e5aa1", "text-halo-color": "white", "text-halo-width": 2 },
       });
-
       map.addLayer({
         id: "mainland-label",
         type: "symbol",
         source: "mainland-region",
-        layout: {
-          "text-field": "Mainland",
-          "text-size": 13,
-          "text-anchor": "center",
-        },
-        paint: {
-          "text-color": "#f59e0b",
-          "text-halo-color": "white",
-          "text-halo-width": 2,
-        },
+        layout: { "text-field": "Mainland", "text-size": 13, "text-anchor": "center" },
+        paint: { "text-color": "#f59e0b", "text-halo-color": "white", "text-halo-width": 2 },
       });
     });
 
@@ -197,7 +147,6 @@ const MapView = () => {
   useEffect(() => {
     if (!markersRef.current.length) return;
 
-    // Show/hide markers based on region
     markersRef.current.forEach(({ marker, region }) => {
       if (activeRegion === "All" || region === activeRegion) {
         marker.addTo(mapRef.current);
@@ -206,28 +155,15 @@ const MapView = () => {
       }
     });
 
-    // Get only visible markers
     const visibleMarkers = markersRef.current.filter(
       ({ region }) => activeRegion === "All" || region === activeRegion,
     );
 
-    // Re-center map on visible markers
     if (visibleMarkers.length > 0) {
       const newBounds = new maplibregl.LngLatBounds();
-      visibleMarkers.forEach(({ marker }) => {
-        newBounds.extend(marker.getLngLat());
-      });
-
-      const centerLng = (newBounds.getWest() + newBounds.getEast()) / 2;
-      const centerLat = (newBounds.getSouth() + newBounds.getNorth()) / 2;
-
+      visibleMarkers.forEach(({ marker }) => newBounds.extend(marker.getLngLat()));
       mapRef.current.fitBounds(newBounds, {
-        padding: {
-          top: 80,
-          bottom: 80,
-          left: 60,
-          right: 60,
-        },
+        padding: { top: 80, bottom: 80, left: 60, right: 60 },
         maxZoom: 10,
         duration: 800,
       });
