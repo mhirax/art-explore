@@ -1,21 +1,13 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import "./ArtGalleryApp.scss";
-import { GALLERIES } from "../data/galleries";
+import { GALLERIES } from "../../data/galleries"; // ← single source of truth
 
 const TABS = [
   { id: "all", label: "All", matchTypes: null },
   { id: "galleries", label: "Galleries", matchTypes: ["gallery"] },
-  {
-    id: "exhibitions",
-    label: "Exhibitions",
-    matchTypes: ["exhibition", "exhibit"],
-  },
+  { id: "exhibitions", label: "Exhibitions", matchTypes: ["exhibition", "exhibit"] },
   { id: "artists", label: "Artists", matchTypes: ["artist", "studio"] },
-  {
-    id: "events",
-    label: "Events",
-    matchTypes: ["event", "performance", "fair"],
-  },
+  { id: "events", label: "Events", matchTypes: ["event", "performance", "fair"] },
 ];
 
 const SORT_OPTIONS = [
@@ -57,14 +49,7 @@ function countForTab(tab, data) {
 }
 
 function placeholderColor(name) {
-  const palette = [
-    "#1a1714",
-    "#2d2a27",
-    "#8a6a5a",
-    "#c1440e",
-    "#3d3530",
-    "#4a3728",
-  ];
+  const palette = ["#1a1714", "#2d2a27", "#8a6a5a", "#c1440e", "#3d3530", "#4a3728"];
   let hash = 0;
   for (let i = 0; i < name.length; i++)
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -72,12 +57,7 @@ function placeholderColor(name) {
 }
 
 function getInitials(name) {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
+  return name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 }
 
 function useGalleryFilters(data) {
@@ -92,11 +72,7 @@ function useGalleryFilters(data) {
   useEffect(() => {
     if (!nearMe || userLocation) return;
     navigator.geolocation?.getCurrentPosition(
-      (pos) =>
-        setUserLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        }),
+      (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       () => setNearMe(false),
     );
   }, [nearMe]);
@@ -106,12 +82,7 @@ function useGalleryFilters(data) {
       data.map((g) => ({
         ...g,
         distanceKm: userLocation
-          ? getDistanceKm(
-              userLocation.lat,
-              userLocation.lng,
-              g.lat ?? 6.45,
-              g.lng ?? 3.42,
-            )
+          ? getDistanceKm(userLocation.lat, userLocation.lng, g.lat ?? 6.45, g.lng ?? 3.42)
           : null,
       })),
     [data, userLocation],
@@ -119,6 +90,7 @@ function useGalleryFilters(data) {
 
   const filtered = useMemo(() => {
     let result = dataWithDistance;
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
@@ -127,40 +99,28 @@ function useGalleryFilters(data) {
           g.neighborhood.toLowerCase().includes(q),
       );
     }
+
     const tab = TABS.find((t) => t.id === activeTab);
     if (tab?.matchTypes) {
       result = result.filter((g) =>
         g.artTypes.some((t) => tab.matchTypes.includes(t.toLowerCase())),
       );
     }
+
     if (openNow) result = result.filter((g) => isOpenNow(g.hours));
     if (topRated) result = result.filter((g) => g.rating >= 4.0);
     if (nearMe && userLocation)
       result = result.filter((g) => g.distanceKm <= 10);
+
     return [...result].sort((a, b) => {
       if (sortBy === "rating") return b.rating - a.rating;
-      if (sortBy === "distance")
-        return (a.distanceKm ?? 999) - (b.distanceKm ?? 999);
+      if (sortBy === "distance") return (a.distanceKm ?? 999) - (b.distanceKm ?? 999);
       return a.name.localeCompare(b.name);
     });
-  }, [
-    dataWithDistance,
-    searchQuery,
-    activeTab,
-    openNow,
-    topRated,
-    nearMe,
-    userLocation,
-    sortBy,
-  ]);
+  }, [dataWithDistance, searchQuery, activeTab, openNow, topRated, nearMe, userLocation, sortBy]);
 
   const hasActiveFilters =
-    searchQuery ||
-    activeTab !== "all" ||
-    nearMe ||
-    openNow ||
-    topRated ||
-    sortBy !== "name";
+    searchQuery || activeTab !== "all" || nearMe || openNow || topRated || sortBy !== "name";
 
   function resetAllFilters() {
     setSearchQuery("");
@@ -221,24 +181,13 @@ function SearchBox({ searchQuery, setSearchQuery }) {
       {raw && (
         <button
           className="search-box__clear"
-          onClick={() => {
-            setRaw("");
-            inputRef.current?.focus();
-          }}
+          onClick={() => { setRaw(""); inputRef.current?.focus(); }}
         >
           ×
         </button>
       )}
       <button className="search-box__icon">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
@@ -266,25 +215,18 @@ function CategoryTabs({ activeTab, setActiveTab, rawData }) {
 }
 
 function FilterRow({
-  nearMe,
-  toggleNearMe,
-  openNow,
-  toggleOpenNow,
-  topRated,
-  toggleTopRated,
-  sortBy,
-  setSortBy,
-  hasActiveFilters,
-  resetAllFilters,
+  nearMe, toggleNearMe,
+  openNow, toggleOpenNow,
+  topRated, toggleTopRated,
+  sortBy, setSortBy,
+  hasActiveFilters, resetAllFilters,
   resultCount,
 }) {
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = useRef(null);
 
   useEffect(() => {
-    const fn = (e) => {
-      if (!sortRef.current?.contains(e.target)) setSortOpen(false);
-    };
+    const fn = (e) => { if (!sortRef.current?.contains(e.target)) setSortOpen(false); };
     document.addEventListener("mousedown", fn);
     return () => document.removeEventListener("mousedown", fn);
   }, []);
@@ -292,38 +234,14 @@ function FilterRow({
   return (
     <div className="filter-row">
       <p className="filter-row__count">Showing {resultCount} results</p>
-
       <div className="filter-row__right">
-        <button
-          className={`chip ${nearMe ? "chip--on" : ""}`}
-          onClick={toggleNearMe}
-        >
-          Near Me
-        </button>
-        <button
-          className={`chip ${openNow ? "chip--on" : ""}`}
-          onClick={toggleOpenNow}
-        >
-          Open Now
-        </button>
-        <button
-          className={`chip ${topRated ? "chip--on" : ""}`}
-          onClick={toggleTopRated}
-        >
-          Top Rated
-        </button>
-
+        <button className={`chip ${nearMe ? "chip--on" : ""}`} onClick={toggleNearMe}>Near Me</button>
+        <button className={`chip ${openNow ? "chip--on" : ""}`} onClick={toggleOpenNow}>Open Now</button>
+        <button className={`chip ${topRated ? "chip--on" : ""}`} onClick={toggleTopRated}>Top Rated</button>
         <div className="sort" ref={sortRef}>
-          <button
-            className="sort__trigger"
-            onClick={() => setSortOpen((p) => !p)}
-          >
+          <button className="sort__trigger" onClick={() => setSortOpen((p) => !p)}>
             {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
-            <span
-              className={`sort__arrow ${sortOpen ? "sort__arrow--open" : ""}`}
-            >
-              ▾
-            </span>
+            <span className={`sort__arrow ${sortOpen ? "sort__arrow--open" : ""}`}>▾</span>
           </button>
           {sortOpen && (
             <ul className="sort__menu">
@@ -331,13 +249,9 @@ function FilterRow({
                 <li key={opt.value}>
                   <button
                     className={`sort__item ${sortBy === opt.value ? "sort__item--active" : ""}`}
-                    onClick={() => {
-                      setSortBy(opt.value);
-                      setSortOpen(false);
-                    }}
+                    onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
                   >
-                    {opt.label}
-                    {sortBy === opt.value && " ✓"}
+                    {opt.label}{sortBy === opt.value && " ✓"}
                   </button>
                 </li>
               ))}
@@ -353,45 +267,35 @@ function GalleryCard({ gallery }) {
   const open = isOpenNow(gallery.hours);
   return (
     <div className="gallery-card">
-      <div
-        className="card__thumb"
-        style={{ backgroundColor: placeholderColor(gallery.name) }}
-      >
+      <div className="card__thumb" style={{ backgroundColor: placeholderColor(gallery.name) }}>
         {gallery.image ? (
           <img src={gallery.image} alt={gallery.name} className="card__img" />
         ) : (
           <span className="card__initials">{getInitials(gallery.name)}</span>
         )}
-        <span
-          className={`card__status card__status--${open ? "open" : "closed"}`}
-        >
+        <span className={`card__status card__status--${open ? "open" : "closed"}`}>
           {open ? "Open" : "Closed"}
         </span>
       </div>
       <div className="card__body">
         <h3 className="card__name">{gallery.name}</h3>
         <p className="card__neighborhood">{gallery.neighborhood}</p>
+        {/* Show address from merged data */}
+        {gallery.address && (
+          <p className="card__address">{gallery.address}</p>
+        )}
         <div className="card__tags">
           {gallery.artTypes.map((t) => (
-            <span key={t} className="card__tag">
-              {t}
-            </span>
+            <span key={t} className="card__tag">{t}</span>
           ))}
         </div>
         <div className="card__rating">
           <div className="card__stars">
             {[1, 2, 3, 4, 5].map((n) => (
-              <span
-                key={n}
-                className={`card__star ${n <= Math.round(gallery.rating) ? "card__star--on" : ""}`}
-              >
-                ★
-              </span>
+              <span key={n} className={`card__star ${n <= Math.round(gallery.rating) ? "card__star--on" : ""}`}>★</span>
             ))}
           </div>
-          <span className="card__rating-value">
-            {gallery.rating.toFixed(1)}
-          </span>
+          <span className="card__rating-value">{gallery.rating.toFixed(1)}</span>
         </div>
       </div>
     </div>
@@ -404,9 +308,7 @@ function ResultsGrid({ galleries, searchQuery }) {
       <div className="empty">
         <p className="empty__heading">No results found</p>
         {searchQuery && (
-          <p className="empty__sub">
-            Nothing matched "<strong>{searchQuery}</strong>".
-          </p>
+          <p className="empty__sub">Nothing matched "<strong>{searchQuery}</strong>".</p>
         )}
       </div>
     );
@@ -422,44 +324,26 @@ function ResultsGrid({ galleries, searchQuery }) {
 
 export default function ArtGalleryApp() {
   const F = useGalleryFilters(GALLERIES);
-
   return (
-    <div className="galleries">
+    <div className="galleries" id="galleries">
       <header className="app__hero">
         <h1 className="app__title">Search</h1>
         <p className="app__subtitle">
           Find artworks, artists, events, exhibitions, and all site information.
         </p>
       </header>
-
       <hr className="app__divider" />
-
-      <SearchBox
-        searchQuery={F.searchQuery}
-        setSearchQuery={F.setSearchQuery}
-      />
-
-      <CategoryTabs
-        activeTab={F.activeTab}
-        setActiveTab={F.setActiveTab}
-        rawData={F.rawData}
-      />
-
+      <SearchBox searchQuery={F.searchQuery} setSearchQuery={F.setSearchQuery} />
+      <CategoryTabs activeTab={F.activeTab} setActiveTab={F.setActiveTab} rawData={F.rawData} />
       <FilterRow
-        nearMe={F.nearMe}
-        toggleNearMe={F.toggleNearMe}
-        openNow={F.openNow}
-        toggleOpenNow={F.toggleOpenNow}
-        topRated={F.topRated}
-        toggleTopRated={F.toggleTopRated}
-        sortBy={F.sortBy}
-        setSortBy={F.setSortBy}
-        hasActiveFilters={F.hasActiveFilters}
-        resetAllFilters={F.resetAllFilters}
+        nearMe={F.nearMe} toggleNearMe={F.toggleNearMe}
+        openNow={F.openNow} toggleOpenNow={F.toggleOpenNow}
+        topRated={F.topRated} toggleTopRated={F.toggleTopRated}
+        sortBy={F.sortBy} setSortBy={F.setSortBy}
+        hasActiveFilters={F.hasActiveFilters} resetAllFilters={F.resetAllFilters}
         resultCount={F.resultCount}
       />
-
       <ResultsGrid galleries={F.filtered} searchQuery={F.searchQuery} />
     </div>
   );
-};
+}
