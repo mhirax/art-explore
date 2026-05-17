@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import "./ArtGalleryApp.scss";
-import { GALLERIES } from "../../data/galleries"; // ← single source of truth
+import { galleries } from "../../data/galleries"; // ← single source of truth
 
 const TABS = [
   { id: "all", label: "All", matchTypes: null },
@@ -323,7 +323,7 @@ function ResultsGrid({ galleries, searchQuery }) {
 }
 
 export default function ArtGalleryApp() {
-  const F = useGalleryFilters(GALLERIES);
+  const F = useGalleryFilters(galleries);
   return (
     <div className="galleries" id="galleries">
       <header className="app__hero">

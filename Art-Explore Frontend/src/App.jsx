@@ -5,9 +5,8 @@ import Carousel from "./components/layout/Carousel.jsx";
 import ArtGalleryApp from "./components/gallery/ArtGalleryApp.jsx";
 import Mapheader from "./components/Map/LagosMap.jsx";
 import MapView from "./components/Map/MapView";
-import { GALLERIES } from "./components/data/galleries.js";
 import "./App.scss";
-import { galleries } from "./data/MapViewData.js";
+import { galleries } from "./data/galleries.js";
 
 function App() {
   const [filteredGalleries, setFilteredGalleries] = useState(galleries);

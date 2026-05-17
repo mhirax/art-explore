@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.scss";
-import { GALLERIES } from "../../data/galleries"; // ← single source of truth
+import { galleries } from "../../data/galleries"; // ← single source of truth
 
 const MapView = () => {
   const mapContainer = useRef(null);
@@ -37,7 +37,7 @@ const MapView = () => {
     `;
 
     // Create all markers from GALLERIES (merged data)
-    const markers = GALLERIES.map((gallery) => {
+    const markers = galleries.map((gallery) => {
       const marker = new maplibregl.Marker({
         element: markerElement.cloneNode(true),
         anchor: "bottom",
@@ -77,7 +77,7 @@ const MapView = () => {
 
     // Calculate bounds from all galleries
     const bounds = new maplibregl.LngLatBounds();
-    GALLERIES.forEach((gallery) => bounds.extend([gallery.lng, gallery.lat]));
+    galleries.forEach((gallery) => bounds.extend([gallery.lng, gallery.lat]));
 
     // Fit map to show all markers
     map.fitBounds(bounds, {

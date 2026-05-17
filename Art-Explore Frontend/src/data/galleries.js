@@ -8,7 +8,7 @@ const CLOSED_NOW = Array(7).fill({ open: "09:00", close: "10:00" });
 // AND gallery-grid fields (artTypes, hours, rating, image).
 // MapView and ArtGalleryApp both import from here.
 
-export const GALLERIES = [
+export const galleries = [
   {
     id: 1,
     name: "Lagos Contemporary",
