@@ -1,3 +1,18 @@
+// ─────────────────────────────────────────────────────────────
+//  MapView.jsx — Production-grade Lagos Gallery Map
+//  /src/components/MapView/MapView.jsx
+//
+//  Layers (all toggleable via Legend panel):
+//    • Neighbourhood fills + labels (zoom-responsive)
+//    • Gallery markers (clustered at low zoom)
+//    • Landmarks (ports, museums, parks, markets)
+//    • Green zones (tree-planting / drainage shading)
+//    • Region overlays (Island / Mainland)
+//
+//  Map library: MapLibre GL JS (open-source, offline-capable)
+//  Tile source: MapTiler (swap key for production)
+// ─────────────────────────────────────────────────────────────
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";

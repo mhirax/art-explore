@@ -3,10 +3,7 @@ const H = new Date().getHours();
 const OPEN_NOW = Array(7).fill({ open: `${H - 1}:00`, close: `${H + 3}:00` });
 const CLOSED_NOW = Array(7).fill({ open: "09:00", close: "10:00" });
 
-// ─── Single Source of Truth: All Lagos Galleries ──────────────
-// Each entry has BOTH map fields (lat, lng, address, region)
-// AND gallery-grid fields (artTypes, hours, rating, image).
-// MapView and ArtGalleryApp both import from here.
+
 
 export const galleries = [
   {
