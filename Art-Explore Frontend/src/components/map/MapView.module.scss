@@ -28,6 +28,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 // ── Region bar ────────────────────────────────────────────────
 .regionBar {
   display:         flex;
+  justify-content: center;
   align-items:     center;
   gap:             8px;
   padding:         10px 0 10px 0;
@@ -55,7 +56,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 .regionBtnMainland { &.regionBtnActive { background: $c-mainland; color: white; border-color: $c-mainland; } }
 
 .zoomHint {
-  margin-left:   auto;
+  // ✅ CHANGED: removed margin-left: auto which was pushing buttons left
   font-size:     11px;
   color:         #94a3b8;
   font-style:    italic;
@@ -93,6 +94,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 
 // ── MapLibre overrides ────────────────────────────────────────
 :global {
+
   // Gallery markers
   .gallery-marker {
     width:     36px;

@@ -1,17 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  MapView.jsx — Production-grade Lagos Gallery Map
-//  /src/components/MapView/MapView.jsx
-//
-//  Layers (all toggleable via Legend panel):
-//    • Neighbourhood fills + labels (zoom-responsive)
-//    • Gallery markers (clustered at low zoom)
-//    • Landmarks (ports, museums, parks, markets)
-//    • Green zones (tree-planting / drainage shading)
-//    • Region overlays (Island / Mainland)
-//
-//  Map library: MapLibre GL JS (open-source, offline-capable)
-//  Tile source: MapTiler (swap key for production)
-// ─────────────────────────────────────────────────────────────
+
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
@@ -22,9 +9,14 @@ import { neighbourhoodsGeoJSON, landmarksGeoJSON } from "../../data/lagosGeo";
 import LegendPanel from "./LegendPanel";
 import GalleryCard from "./GalleryCard";
 
-// ── Constants ─────────────────────────────────────────────────
-const LAGOS_CENTER = [3.3792, 6.5244];
-const MAPTILER_KEY = "eBsT19HyOExrdi0WUD3x"; // ← replace for production
+const MAPTILER_KEY = "eBsT19HyOExrdi0WUD3x";
+
+const ALL_BOUNDS = [
+  [3.343, 6.435],
+  [3.458, 6.575],
+];
+
+const ALL_GALLERIES_CENTER = [3.4004, 6.5083];
 
 const LAYER_DEFAULTS = {
   neighbourhoods: true,
@@ -34,23 +26,60 @@ const LAYER_DEFAULTS = {
   galleries: true,
 };
 
-// Zoom thresholds for label / feature visibility
-const ZOOM = { overview: 10, district: 12, street: 14, detail: 16 };
+const ZOOM = { overview: 11, district: 12, street: 14, detail: 16 };
+
+const FIT_PADDING = { top: 100, bottom: 60, left: 60, right: 280 };
+
+// ── create GeoJSON from galleries array ────────────────────────
+// Each gallery becomes a GeoJSON Point feature.
+const buildGalleriesGeoJSON = (galleryList) => ({
+  type: "FeatureCollection",
+  features: galleryList.map((g) => ({
+    type: "Feature",
+    properties: {
+      id: g.id,
+      name: g.name,
+      neighborhood: g.neighborhood,
+      address: g.address,
+      region: g.region,
+      rating: g.rating,
+      image: g.image,
+      artTypes: JSON.stringify(g.artTypes || []),
+    },
+    geometry: { type: "Point", coordinates: [g.lng, g.lat] },
+  })),
+});
+
+// ── SVG pin → base64 data URL for map.addImage() 
+const createPinImage = () =>
+  new Promise((resolve) => {
+    const svg = `
+      <svg viewBox="0 0 28 38" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="38">
+        <path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 24 14 24S28 24.5 28 14C28 6.3 21.7 0 14 0z" fill="#e63946"/>
+        <circle cx="14" cy="13" r="5.5" fill="white" fill-opacity="0.92"/>
+      </svg>`;
+    const img = new Image(28, 38);
+    img.onload = () => resolve(img);
+    img.src = `data:image/svg+xml;base64,${btoa(svg)}`;
+  });
 
 // ── Component ─────────────────────────────────────────────────
 const MapView = () => {
   const mapContainer = useRef(null);
-  const mapRef       = useRef(null);
-  const markersRef   = useRef([]);
-  const popupsRef    = useRef({});
+  const mapRef = useRef(null);
 
-  const [activeRegion,  setActiveRegion]  = useState("Island"); // Default to Island — primary gallery cluster
-  const [activeLayers,  setActiveLayers]  = useState(LAYER_DEFAULTS);
+  const [activeRegion, setActiveRegion] = useState("All");
+  const [activeLayers, setActiveLayers] = useState(LAYER_DEFAULTS);
   const [selectedGallery, setSelectedGallery] = useState(null);
-  const [mapReady,      setMapReady]      = useState(false);
-  const [currentZoom,   setCurrentZoom]   = useState(10);
+  const [mapReady, setMapReady] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState(10);
 
-  // ── Fly to a gallery with smooth easing ───────────────────
+  const activeRegionRef = useRef("All");
+  useEffect(() => {
+    activeRegionRef.current = activeRegion;
+  }, [activeRegion]);
+
+  // ── Fly to a gallery ─────────────────────────────────────
   const flyToGallery = useCallback((gallery) => {
     if (!mapRef.current) return;
     mapRef.current.flyTo({
@@ -58,14 +87,14 @@ const MapView = () => {
       zoom: ZOOM.detail,
       speed: 1.2,
       curve: 1.4,
-      easing: (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t, // ease-in-out quad
+      easing: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
       duration: 1800,
       essential: true,
     });
     setSelectedGallery(gallery);
   }, []);
 
-  // ── Fly to a neighbourhood centroid ───────────────────────
+  // ── Fly to a neighbourhood ────────────────────────────────
   const flyToNeighbourhood = useCallback((lng, lat, zoom = ZOOM.district) => {
     if (!mapRef.current) return;
     mapRef.current.flyTo({
@@ -73,7 +102,7 @@ const MapView = () => {
       zoom,
       speed: 1.0,
       curve: 1.2,
-      easing: (t) => 1 - Math.pow(1 - t, 3), // ease-out cubic
+      easing: (t) => 1 - Math.pow(1 - t, 3),
       duration: 1400,
     });
   }, []);
@@ -81,114 +110,112 @@ const MapView = () => {
   // ── Reset to overview ─────────────────────────────────────
   const resetView = useCallback(() => {
     if (!mapRef.current) return;
-    // Reset to Island view — the primary gallery cluster
-    const islandGalleries = galleries.filter(g => g.region === 'Island');
-    const bounds = new maplibregl.LngLatBounds();
-    islandGalleries.forEach((g) => bounds.extend([g.lng, g.lat]));
-    mapRef.current.fitBounds(bounds, {
-      padding: { top: 80, bottom: 80, left: 80, right: 340 },
-      maxZoom: 13,
-      duration: 1200,
-      easing: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+    mapRef.current.fitBounds(ALL_BOUNDS, {
+      padding: FIT_PADDING,
+      duration: 1000,
     });
     setSelectedGallery(null);
   }, []);
 
-  // ── Toggle layer visibility ────────────────────────────────
-  const toggleLayer = useCallback((layerKey) => {
-    setActiveLayers((prev) => {
-      const next = { ...prev, [layerKey]: !prev[layerKey] };
-      applyLayerVisibility(mapRef.current, next);
-      return next;
-    });
-  }, []);
-
-  // ── Apply MapLibre layer visibility ───────────────────────
-  const applyLayerVisibility = (map, layers) => {
+  // ── Apply layer visibility ────────────────────────────────
+  const applyLayerVisibility = useCallback((layers) => {
+    const map = mapRef.current;
     if (!map) return;
-
-    const vis = (bool) => (bool ? "visible" : "none");
-
-    const safe = (id, visibility) => {
-      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visibility);
+    const vis = (b) => (b ? "visible" : "none");
+    const safe = (id, v) => {
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", v);
     };
 
-    // Neighbourhood fills + outlines + labels
-    safe("neighbourhood-fill",    vis(layers.neighbourhoods));
+    safe("neighbourhood-fill", vis(layers.neighbourhoods));
     safe("neighbourhood-outline", vis(layers.neighbourhoods));
-    safe("neighbourhood-label",   vis(layers.neighbourhoods));
-
-    // Landmarks
-    safe("landmark-icon",  vis(layers.landmarks));
+    safe("neighbourhood-label", vis(layers.neighbourhoods));
+    safe("landmark-icon", vis(layers.landmarks));
     safe("landmark-label", vis(layers.landmarks));
-
-    // Green zones
-    safe("green-zone-fill",    vis(layers.greenZones));
+    safe("green-zone-fill", vis(layers.greenZones));
     safe("green-zone-outline", vis(layers.greenZones));
-    safe("green-zone-label",   vis(layers.greenZones));
-
-    // Region overlays
-    safe("island-overlay",   vis(layers.regionOverlays));
+    safe("green-zone-label", vis(layers.greenZones));
+    safe("island-overlay", vis(layers.regionOverlays));
     safe("mainland-overlay", vis(layers.regionOverlays));
-    safe("island-label",     vis(layers.regionOverlays));
-    safe("mainland-label",   vis(layers.regionOverlays));
+    safe("island-label", vis(layers.regionOverlays));
+    safe("mainland-label", vis(layers.regionOverlays));
+    safe("gallery-pins", vis(layers.galleries));
+    safe("gallery-labels", vis(layers.galleries));
+  }, []);
 
-    // Gallery markers (DOM-based)
-    markersRef.current.forEach(({ marker, region }) => {
-      if (!layers.galleries) {
-        marker.remove();
-      } else {
-        const regionMatch =
-          activeRegionRef.current === "All" || region === activeRegionRef.current;
-        if (regionMatch) marker.addTo(map);
-        else marker.remove();
-      }
-    });
-  };
+  const toggleLayer = useCallback(
+    (layerKey) => {
+      setActiveLayers((prev) => {
+        const next = { ...prev, [layerKey]: !prev[layerKey] };
+        applyLayerVisibility(next);
+        return next;
+      });
+    },
+    [applyLayerVisibility],
+  );
 
-  // Keep activeRegion in a ref so the applyLayerVisibility closure can access it
-  const activeRegionRef = useRef(activeRegion);
-  useEffect(() => { activeRegionRef.current = activeRegion; }, [activeRegion]);
+  // ── Update gallery filter (region button) ────────────────
+  // Updates the GeoJSON source data to only include visible region.
+  const updateGalleryFilter = useCallback((region) => {
+    const map = mapRef.current;
+    if (!map || !mapReady || !map.getSource("galleries")) return;
+    const filtered =
+      region === "All"
+        ? galleries
+        : galleries.filter((g) => g.region === region);
+    map.getSource("galleries").setData(buildGalleriesGeoJSON(filtered));
 
-  // ── Map init ──────────────────────────────────────────────
+    // Fit bounds to the filtered set
+    if (region === "All") {
+      map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
+    } else {
+      const bounds = new maplibregl.LngLatBounds();
+      filtered.forEach((g) => bounds.extend([g.lng, g.lat]));
+      map.fitBounds(bounds, {
+        padding: FIT_PADDING,
+        maxZoom: 13,
+        duration: 800,
+      });
+    }
+  }, []);
+
+  // ── Map initialisation ────────────────────────────────────
   useEffect(() => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
-      // Start focused on Island galleries (13 of 15 galleries are here)
-      // Mainland galleries (Yaba, Ikeja) are selected via the region buttons
-      center: [3.4300, 6.4490],
-      zoom: 13,
+      center: ALL_GALLERIES_CENTER,
+      zoom: 10,
       minZoom: 9,
-      // Generous bounds — covers all galleries from Marina to Ikeja to Lekki
-      maxBounds: [[2.90, 6.10], [3.90, 6.90]],
+      maxBounds: [
+        [2.9, 6.1],
+        [3.9, 6.9],
+      ],
       attributionControl: false,
     });
 
     mapRef.current = map;
 
-    // Attribution (minimal)
     map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
-      "bottom-right"
+      "bottom-right",
     );
-
-    // Navigation controls
     map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
-      "top-right"
+      "top-right",
     );
-
-    // Track zoom for zoom-responsive UI hints
     map.on("zoom", () => setCurrentZoom(Math.round(map.getZoom())));
 
-    map.on("load", () => {
-      // ── 1. Neighbourhood fills ─────────────────────────────
+    map.on("load", async () => {
+      // ── Load pin image into MapLibre sprite atlas ────────
+      // Must be done before adding the symbol layer.
+      const pinImg = await createPinImage();
+      map.addImage("gallery-pin", pinImg, { pixelRatio: 2 });
+
+      // ── 1. Neighbourhood fills ───────────────────────────
       map.addSource("neighbourhoods", {
         type: "geojson",
         data: neighbourhoodsGeoJSON,
       });
-
       map.addLayer({
         id: "neighbourhood-fill",
         type: "fill",
@@ -197,14 +224,18 @@ const MapView = () => {
         paint: {
           "fill-color": ["get", "color"],
           "fill-opacity": [
-            "interpolate", ["linear"], ["zoom"],
-            10, 0.06,
-            13, 0.10,
-            15, 0.14,
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10,
+            0.06,
+            13,
+            0.1,
+            15,
+            0.14,
           ],
         },
       });
-
       map.addLayer({
         id: "neighbourhood-outline",
         type: "line",
@@ -213,15 +244,19 @@ const MapView = () => {
         paint: {
           "line-color": ["get", "color"],
           "line-width": [
-            "interpolate", ["linear"], ["zoom"],
-            10, 0.8,
-            13, 1.6,
-            15, 2.2,
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10,
+            0.8,
+            13,
+            1.6,
+            15,
+            2.2,
           ],
           "line-opacity": 0.5,
         },
       });
-
       map.addLayer({
         id: "neighbourhood-label",
         type: "symbol",
@@ -231,10 +266,15 @@ const MapView = () => {
         layout: {
           "text-field": ["get", "name"],
           "text-size": [
-            "interpolate", ["linear"], ["zoom"],
-            10, 11,
-            13, 15,
-            15, 18,
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10,
+            11,
+            13,
+            15,
+            15,
+            18,
           ],
           "text-font": ["Open Sans SemiBold", "Arial Unicode MS Bold"],
           "text-anchor": "center",
@@ -245,23 +285,25 @@ const MapView = () => {
           "text-halo-color": "rgba(255,255,255,0.9)",
           "text-halo-width": 2,
           "text-opacity": [
-            "interpolate", ["linear"], ["zoom"],
-            9.5, 0,
-            10.5, 1,
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            9.5,
+            0,
+            10.5,
+            1,
           ],
         },
       });
 
-      // ── 2. Green zones (tree-planting / drainage) ──────────
+      // ── 2. Green zones ───────────────────────────────────
       const greenFeatures = {
         type: "FeatureCollection",
         features: landmarksGeoJSON.features.filter(
-          (f) => f.properties.category === "green-zone"
+          (f) => f.properties.category === "green-zone",
         ),
       };
-
       map.addSource("green-zones", { type: "geojson", data: greenFeatures });
-
       map.addLayer({
         id: "green-zone-fill",
         type: "fill",
@@ -269,14 +311,16 @@ const MapView = () => {
         paint: {
           "fill-color": "#16a34a",
           "fill-opacity": [
-            "interpolate", ["linear"], ["zoom"],
-            10, 0.08,
-            14, 0.18,
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10,
+            0.08,
+            14,
+            0.18,
           ],
-          "fill-pattern": undefined, // Can add hatching texture via addImage
         },
       });
-
       map.addLayer({
         id: "green-zone-outline",
         type: "line",
@@ -288,7 +332,6 @@ const MapView = () => {
           "line-opacity": 0.7,
         },
       });
-
       map.addLayer({
         id: "green-zone-label",
         type: "symbol",
@@ -307,16 +350,14 @@ const MapView = () => {
         },
       });
 
-      // ── 3. Landmarks ───────────────────────────────────────
+      // ── 3. Landmarks ─────────────────────────────────────
       const landmarkPoints = {
         type: "FeatureCollection",
         features: landmarksGeoJSON.features.filter(
-          (f) => f.geometry.type === "Point"
+          (f) => f.geometry.type === "Point",
         ),
       };
-
       map.addSource("landmarks", { type: "geojson", data: landmarkPoints });
-
       map.addLayer({
         id: "landmark-icon",
         type: "symbol",
@@ -324,23 +365,21 @@ const MapView = () => {
         minzoom: 11,
         layout: {
           "text-field": ["get", "icon"],
-          "text-size": [
-            "interpolate", ["linear"], ["zoom"],
-            11, 14,
-            14, 20,
-          ],
+          "text-size": ["interpolate", ["linear"], ["zoom"], 11, 14, 14, 20],
           "text-allow-overlap": false,
-          "text-ignore-placement": false,
         },
         paint: {
           "text-opacity": [
-            "interpolate", ["linear"], ["zoom"],
-            10.5, 0,
-            11.5, 1,
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10.5,
+            0,
+            11.5,
+            1,
           ],
         },
       });
-
       map.addLayer({
         id: "landmark-label",
         type: "symbol",
@@ -358,32 +397,18 @@ const MapView = () => {
           "text-color": "#374151",
           "text-halo-color": "rgba(255,255,255,0.92)",
           "text-halo-width": 1.5,
-          "text-opacity": [
-            "interpolate", ["linear"], ["zoom"],
-            12, 0,
-            13, 1,
-          ],
+          "text-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0, 13, 1],
         },
       });
-
-      // Landmark click popup
       map.on("click", "landmark-icon", (e) => {
-        const props = e.features[0].properties;
-        const coords = e.features[0].geometry.coordinates;
+        const p = e.features[0].properties;
         new maplibregl.Popup({ offset: [0, -8], maxWidth: "240px" })
-          .setLngLat(coords)
-          .setHTML(`
-            <div class="landmark-popup">
-              <span class="landmark-popup__icon">${props.icon}</span>
-              <div>
-                <strong>${props.name}</strong>
-                <p>${props.description}</p>
-              </div>
-            </div>
-          `)
+          .setLngLat(e.features[0].geometry.coordinates)
+          .setHTML(
+            `<div class="landmark-popup"><span class="landmark-popup__icon">${p.icon}</span><div><strong>${p.name}</strong><p>${p.description}</p></div></div>`,
+          )
           .addTo(map);
       });
-
       map.on("mouseenter", "landmark-icon", () => {
         map.getCanvas().style.cursor = "pointer";
       });
@@ -391,43 +416,53 @@ const MapView = () => {
         map.getCanvas().style.cursor = "";
       });
 
-      // ── 4. Region overlays (vague background zones) ────────
+      // ── 4. Region overlays ───────────────────────────────
       map.addSource("island-region", {
         type: "geojson",
         data: {
           type: "Feature",
           geometry: {
             type: "Polygon",
-            coordinates: [[[3.28, 6.40], [3.50, 6.40], [3.50, 6.48], [3.28, 6.48]]],
+            coordinates: [
+              [
+                [3.28, 6.4],
+                [3.5, 6.4],
+                [3.5, 6.48],
+                [3.28, 6.48],
+              ],
+            ],
           },
         },
       });
-
       map.addSource("mainland-region", {
         type: "geojson",
         data: {
           type: "Feature",
           geometry: {
             type: "Polygon",
-            coordinates: [[[3.20, 6.48], [3.46, 6.48], [3.46, 6.66], [3.20, 6.66]]],
+            coordinates: [
+              [
+                [3.2, 6.48],
+                [3.46, 6.48],
+                [3.46, 6.66],
+                [3.2, 6.66],
+              ],
+            ],
           },
         },
       });
-
       map.addLayer({
         id: "island-overlay",
         type: "fill",
         source: "island-region",
         paint: { "fill-color": "#0c50bd", "fill-opacity": 0.04 },
       });
-
       map.addLayer({
         id: "mainland-overlay",
         type: "fill",
         source: "mainland-region",
         paint: { "fill-color": "#92400e", "fill-opacity": 0.04 },
       });
-
       map.addLayer({
         id: "island-label",
         type: "symbol",
@@ -445,7 +480,6 @@ const MapView = () => {
           "text-halo-width": 2,
         },
       });
-
       map.addLayer({
         id: "mainland-label",
         type: "symbol",
@@ -464,71 +498,116 @@ const MapView = () => {
         },
       });
 
-      // ── 5. Gallery markers ─────────────────────────────────
-      const markers = galleries.map((gallery) => {
-        const el = document.createElement("div");
-        el.className = `gallery-marker gallery-marker--${gallery.region.toLowerCase()}`;
-        el.setAttribute("aria-label", gallery.name);
-        el.innerHTML = `
-          <svg viewBox="0 0 28 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 24 14 24S28 24.5 28 14C28 6.3 21.7 0 14 0z"
-              fill="#e63946"/>
-            <circle cx="14" cy="13" r="5.5" fill="white" fill-opacity="0.9"/>
-          </svg>
-          <span class="gallery-marker__pulse"></span>
-        `;
-
-        const popup = new maplibregl.Popup({
-          offset: [0, -40],
-          maxWidth: "300px",
-          closeButton: true,
-          className: "gallery-popup-wrapper",
-        }).setHTML(`
-          <div class="popup-content">
-            <img src="${gallery.image}" alt="${gallery.name}" class="popup-image"
-              onerror="this.src='https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400&q=60'"
-            />
-            <div class="popup-text">
-              <div class="popup-meta">
-                <span class="popup-region popup-region--${gallery.region.toLowerCase()}">${gallery.region}</span>
-                <span class="popup-neighbourhood">${gallery.neighborhood}</span>
-              </div>
-              <h4>${gallery.name}</h4>
-              <p>${gallery.address}</p>
-              <div class="popup-footer">
-                <span class="popup-rating">★ ${gallery.rating}</span>
-                <span class="popup-tags">${(gallery.artTypes || []).join(" · ")}</span>
-              </div>
-            </div>
-          </div>
-        `);
-
-        popupsRef.current[gallery.id] = popup;
-
-        const marker = new maplibregl.Marker({ element: el, anchor: "bottom" })
-          .setLngLat([gallery.lng, gallery.lat])
-          .setPopup(popup)
-          .addTo(map);
-
-        el.addEventListener("click", () => flyToGallery(gallery));
-
-        return { marker, region: gallery.region, gallery };
+      // ── 5. Gallery pins — GeoJSON symbol layer ───────────
+      // This replaces all DOM markers. Points live on the WebGL canvas,
+      // never outside the container, never clipped by overflow:hidden.
+      map.addSource("galleries", {
+        type: "geojson",
+        data: buildGalleriesGeoJSON(galleries), // all 15 on load
       });
 
-      markersRef.current = markers;
+      // Pin icon layer
+      map.addLayer({
+        id: "gallery-pins",
+        type: "symbol",
+        source: "galleries",
+        layout: {
+          "icon-image": "gallery-pin",
+          "icon-size": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            10,
+            1.2,
+            14,
+            1.8,
+            15,
+            2.2,
+          ],
+          "icon-anchor": "bottom", // pin tip points at exact coordinate
+          "icon-allow-overlap": true, // always show all pins
+          "icon-ignore-placement": true,
+          "text-field": "", // no label on pin itself
+        },
+        paint: {
+          "icon-opacity": ["interpolate", ["linear"], ["zoom"], 8.5, 0, 9.5, 1],
+        },
+      });
+
+      // Gallery name label — appears below pin at higher zooms
+      map.addLayer({
+        id: "gallery-labels",
+        type: "symbol",
+        source: "galleries",
+        minzoom: 13,
+        layout: {
+          "text-field": ["get", "name"],
+          "text-size": 11,
+          "text-font": ["Open Sans SemiBold", "Arial Unicode MS Bold"],
+          "text-anchor": "top",
+          "text-offset": [0, 0.6],
+          "text-max-width": 10,
+          "text-allow-overlap": false,
+        },
+        paint: {
+          "text-color": "#1a1a2e",
+          "text-halo-color": "rgba(255,255,255,0.95)",
+          "text-halo-width": 2,
+          "text-opacity": ["interpolate", ["linear"], ["zoom"], 13, 0, 14, 1],
+        },
+      });
+
+      // ── Click on a gallery pin → open card ───────────────
+      map.on("click", "gallery-pins", (e) => {
+        const props = e.features[0].properties;
+        // Reconstruct the full gallery object from stored properties
+        const gallery = galleries.find((g) => g.id === props.id);
+        if (gallery) {
+          flyToGallery(gallery);
+          // Show rich popup
+          new maplibregl.Popup({
+            offset: [0, -42],
+            maxWidth: "300px",
+            closeButton: true,
+            className: "gallery-popup-wrapper",
+          })
+            .setLngLat(e.features[0].geometry.coordinates)
+            .setHTML(
+              `
+            <div class="popup-content">
+              <img src="${gallery.image}" alt="${gallery.name}" class="popup-image"
+                onerror="this.src='https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400&q=60'"/>
+              <div class="popup-text">
+                <div class="popup-meta">
+                  <span class="popup-region popup-region--${gallery.region.toLowerCase()}">${gallery.region}</span>
+                  <span class="popup-neighbourhood">${gallery.neighborhood}</span>
+                </div>
+                <h4>${gallery.name}</h4>
+                <p>${gallery.address}</p>
+                <div class="popup-footer">
+                  <span class="popup-rating">★ ${gallery.rating}</span>
+                  <span class="popup-tags">${(gallery.artTypes || []).join(" · ")}</span>
+                </div>
+              </div>
+            </div>
+          `,
+            )
+            .addTo(map);
+        }
+      });
+
+      map.on("mouseenter", "gallery-pins", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "gallery-pins", () => {
+        map.getCanvas().style.cursor = "";
+      });
+
       setMapReady(true);
 
-      // Default view: fit Island galleries only (lat 6.435–6.456, a 2.4km cluster)
-      // This shows street-level detail over land, not ocean.
-      // "All Lagos" overview is available via the Overview button.
-      // Mainland galleries (Yaba/Ikeja) appear when user clicks "Mainland" tab.
-      const islandGalleries = galleries.filter(g => g.region === 'Island');
-      const defaultBounds = new maplibregl.LngLatBounds();
-      islandGalleries.forEach((g) => defaultBounds.extend([g.lng, g.lat]));
-      map.fitBounds(defaultBounds, {
-        padding: { top: 80, bottom: 80, left: 80, right: 340 },
-        maxZoom: 13,
-        duration: 900,
+      // ── Fit ALL 15 into view once tiles + symbols painted ─
+      map.once("idle", () => {
+        map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
       });
     }); // end map.on("load")
 
@@ -538,43 +617,22 @@ const MapView = () => {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Region filter effect ───────────────────────────────────
+  // ── Region filter effect ──────────────────────────────────
   useEffect(() => {
-    if (!mapReady || !markersRef.current.length) return;
+    if (!mapReady) return;
+    updateGalleryFilter(activeRegion);
+    applyLayerVisibility({ ...activeLayers });
+  }, [activeRegion, mapReady, updateGalleryFilter, applyLayerVisibility]);
 
-    const map = mapRef.current;
-    const bounds = new maplibregl.LngLatBounds();
+  // ── Galleries toggle effect ───────────────────────────────
+  useEffect(() => {
+    if (!mapReady) return;
+    applyLayerVisibility(activeLayers);
+  }, [activeLayers, mapReady, applyLayerVisibility]);
 
-    markersRef.current.forEach(({ marker, region, gallery }) => {
-      const show =
-        activeLayers.galleries &&
-        (activeRegion === "All" || region === activeRegion);
-
-      if (show) {
-        marker.addTo(map);
-        bounds.extend([gallery.lng, gallery.lat]);
-      } else {
-        marker.remove();
-      }
-    });
-
-    if (!bounds.isEmpty()) {
-      // For Island-only: zoom 13 shows streets clearly
-      // For All/Mainland: zoom 10 fits Ikeja+Island but shows ocean south of VI (expected)
-      const isIslandOnly = activeRegion === 'Island';
-      map.fitBounds(bounds, {
-        padding: { top: 80, bottom: 80, left: 80, right: 340 },
-        maxZoom: isIslandOnly ? 13 : 10,
-        duration: 800,
-        easing: (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
-      });
-    }
-  }, [activeRegion, activeLayers.galleries, mapReady]);
-
-  // ── Render ─────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────
   return (
     <div className={styles.mapWrapper}>
-      {/* Region switcher */}
       <div className={styles.regionBar}>
         {["All", "Island", "Mainland"].map((r) => (
           <button
@@ -586,21 +644,18 @@ const MapView = () => {
           </button>
         ))}
 
-        <div className={styles.zoomHint}>
-          {currentZoom < 11 && <span>Zoom in for neighbourhoods</span>}
-          {currentZoom >= 11 && currentZoom < 13 && <span>Zoom in for landmarks</span>}
-          {currentZoom >= 13 && <span>Street level detail</span>}
-        </div>
-
-        <button className={styles.resetBtn} onClick={resetView} title="Reset view">
+   
+        <button
+          className={styles.resetBtn}
+          onClick={resetView}
+          title="Reset view"
+        >
           ⤢ Overview
         </button>
       </div>
 
-      {/* Map canvas */}
       <div ref={mapContainer} className={styles.mapContainer} />
 
-      {/* Legend panel */}
       <LegendPanel
         activeLayers={activeLayers}
         onToggle={toggleLayer}
@@ -610,7 +665,6 @@ const MapView = () => {
         activeRegion={activeRegion}
       />
 
-      {/* Selected gallery card */}
       {selectedGallery && (
         <GalleryCard
           gallery={selectedGallery}
