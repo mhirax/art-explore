@@ -1,3 +1,18 @@
+// ─────────────────────────────────────────────────────────────
+//  MapView.jsx — Production-grade Lagos Gallery Map
+//  /src/components/MapView/MapView.jsx
+//
+//  Layers (all toggleable via Legend panel):
+//    • Neighbourhood fills + labels (zoom-responsive)
+//    • Gallery markers (clustered at low zoom)
+//    • Landmarks (ports, museums, parks, markets)
+//    • Green zones (tree-planting / drainage shading)
+//    • Region overlays (Island / Mainland)
+//
+//  Map library: MapLibre GL JS (open-source, offline-capable)
+//  Tile source: MapTiler (swap key for production)
+// ─────────────────────────────────────────────────────────────
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -29,7 +44,7 @@ const MapView = () => {
   const markersRef   = useRef([]);
   const popupsRef    = useRef({});
 
-  const [activeRegion,  setActiveRegion]  = useState("All");
+  const [activeRegion,  setActiveRegion]  = useState("Island"); // Default to Island — primary gallery cluster
   const [activeLayers,  setActiveLayers]  = useState(LAYER_DEFAULTS);
   const [selectedGallery, setSelectedGallery] = useState(null);
   const [mapReady,      setMapReady]      = useState(false);
@@ -66,11 +81,13 @@ const MapView = () => {
   // ── Reset to overview ─────────────────────────────────────
   const resetView = useCallback(() => {
     if (!mapRef.current) return;
+    // Reset to Island view — the primary gallery cluster
+    const islandGalleries = galleries.filter(g => g.region === 'Island');
     const bounds = new maplibregl.LngLatBounds();
-    galleries.forEach((g) => bounds.extend([g.lng, g.lat]));
+    islandGalleries.forEach((g) => bounds.extend([g.lng, g.lat]));
     mapRef.current.fitBounds(bounds, {
-      padding: { top: 100, bottom: 100, left: 80, right: 80 },
-      maxZoom: ZOOM.overview,
+      padding: { top: 80, bottom: 80, left: 80, right: 340 },
+      maxZoom: 13,
       duration: 1200,
       easing: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
     });
@@ -138,10 +155,13 @@ const MapView = () => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
-      center: LAGOS_CENTER,
-      zoom: 10,
+      // Start focused on Island galleries (13 of 15 galleries are here)
+      // Mainland galleries (Yaba, Ikeja) are selected via the region buttons
+      center: [3.4300, 6.4490],
+      zoom: 13,
       minZoom: 9,
-      maxBounds: [[3.05, 6.18], [3.78, 6.80]],
+      // Generous bounds — covers all galleries from Marina to Ikeja to Lekki
+      maxBounds: [[2.90, 6.10], [3.90, 6.90]],
       attributionControl: false,
     });
 
@@ -452,7 +472,7 @@ const MapView = () => {
         el.innerHTML = `
           <svg viewBox="0 0 28 38" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 24 14 24S28 24.5 28 14C28 6.3 21.7 0 14 0z"
-              fill="${gallery.region === 'Island' ? '#1a6bbd' : '#b45309'}"/>
+              fill="#e63946"/>
             <circle cx="14" cy="13" r="5.5" fill="white" fill-opacity="0.9"/>
           </svg>
           <span class="gallery-marker__pulse"></span>
@@ -498,13 +518,17 @@ const MapView = () => {
       markersRef.current = markers;
       setMapReady(true);
 
-      // Fit to show all galleries
-      const bounds = new maplibregl.LngLatBounds();
-      galleries.forEach((g) => bounds.extend([g.lng, g.lat]));
-      map.fitBounds(bounds, {
-        padding: { top: 90, bottom: 90, left: 70, right: 70 },
-        maxZoom: ZOOM.overview,
-        duration: 1000,
+      // Default view: fit Island galleries only (lat 6.435–6.456, a 2.4km cluster)
+      // This shows street-level detail over land, not ocean.
+      // "All Lagos" overview is available via the Overview button.
+      // Mainland galleries (Yaba/Ikeja) appear when user clicks "Mainland" tab.
+      const islandGalleries = galleries.filter(g => g.region === 'Island');
+      const defaultBounds = new maplibregl.LngLatBounds();
+      islandGalleries.forEach((g) => defaultBounds.extend([g.lng, g.lat]));
+      map.fitBounds(defaultBounds, {
+        padding: { top: 80, bottom: 80, left: 80, right: 340 },
+        maxZoom: 13,
+        duration: 900,
       });
     }); // end map.on("load")
 
@@ -535,9 +559,12 @@ const MapView = () => {
     });
 
     if (!bounds.isEmpty()) {
+      // For Island-only: zoom 13 shows streets clearly
+      // For All/Mainland: zoom 10 fits Ikeja+Island but shows ocean south of VI (expected)
+      const isIslandOnly = activeRegion === 'Island';
       map.fitBounds(bounds, {
-        padding: { top: 90, bottom: 90, left: 70, right: 70 },
-        maxZoom: ZOOM.overview,
+        padding: { top: 80, bottom: 80, left: 80, right: 340 },
+        maxZoom: isIslandOnly ? 13 : 10,
         duration: 800,
         easing: (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
       });
