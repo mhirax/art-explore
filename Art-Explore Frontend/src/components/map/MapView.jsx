@@ -1,5 +1,3 @@
-
-
 import { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -50,7 +48,7 @@ const buildGalleriesGeoJSON = (galleryList) => ({
   })),
 });
 
-// ── SVG pin → base64 data URL for map.addImage() 
+// ── SVG pin → base64 data URL for map.addImage()
 const createPinImage = () =>
   new Promise((resolve) => {
     const svg = `
@@ -155,29 +153,32 @@ const MapView = () => {
 
   // ── Update gallery filter (region button) ────────────────
   // Updates the GeoJSON source data to only include visible region.
-  const updateGalleryFilter = useCallback((region) => {
-    const map = mapRef.current;
-    if (!map || !mapReady || !map.getSource("galleries")) return;
-    const filtered =
-      region === "All"
-        ? galleries
-        : galleries.filter((g) => g.region === region);
-    map.getSource("galleries").setData(buildGalleriesGeoJSON(filtered));
+  const updateGalleryFilter = useCallback(
+    (region) => {
+      const map = mapRef.current;
+      if (!map || !mapReady || !map.getSource("galleries")) return;
+      const filtered =
+        region === "All"
+          ? galleries
+          : galleries.filter((g) => g.region === region);
+      map.getSource("galleries").setData(buildGalleriesGeoJSON(filtered));
 
-    // Fit bounds to the filtered set
-    if (region === "All") {
-      map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
-    } else {
-      const bounds = new maplibregl.LngLatBounds();
-      filtered.forEach((g) => bounds.extend([g.lng, g.lat]));
-      map.fitBounds(bounds, {
-        padding: FIT_PADDING,
-        maxZoom: 13,
-        duration: 800,
-      });
-    }
-  }, []);
-
+      // Fit bounds to the filtered set
+      if (region === "All") {
+        map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
+      } else {
+        const bounds = new maplibregl.LngLatBounds();
+        filtered.forEach((g) => bounds.extend([g.lng, g.lat]));
+        map.fitBounds(bounds, {
+          padding: FIT_PADDING,
+          maxZoom: 13,
+          duration: 800,
+        });
+      }
+    },
+    [galleries, mapReady],
+  ); // ✅ Added dependencies
+  
   // ── Map initialisation ────────────────────────────────────
   useEffect(() => {
     const map = new maplibregl.Map({
@@ -644,7 +645,6 @@ const MapView = () => {
           </button>
         ))}
 
-   
         <button
           className={styles.resetBtn}
           onClick={resetView}
