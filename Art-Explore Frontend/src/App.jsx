@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import Carousel from "./components/layout/Carousel.jsx";
+import Herosection1 from "./components/layout/HeroCinematic.jsx"
+import Herosection2 from "./components/layout/HeroEditorial.jsx"
+import Herosection3 from "./components/layout/HeroTypographic.jsx";
 import ArtGalleryApp from "./components/gallery/ArtGalleryApp.jsx";
 import Mapheader from "./components/Map/LagosMap.jsx";
 import MapView from "./components/Map/MapView";
@@ -79,6 +82,9 @@ function App() {
   return (
     <div className="app">
       <Navbar />
+      <Herosection2 />
+      <Herosection1 />
+      <Herosection3 />
       <Carousel />
       <Mapheader />
       <MapView />

@@ -1,0 +1,395 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap');
+
+// ── Tokens ────────────────────────────────────────────────────
+$font-display : 'Playfair Display', Georgia, serif;
+$font-body    : 'DM Sans', sans-serif;
+$cream        : #f5f1ea;
+$ink          : #111111;
+$muted        : #888880;
+$rule         : #ddd9d0;
+$accent       : #c8391a;
+$white        : #ffffff;
+$ease         : cubic-bezier(.4, 0, .2, 1);
+
+// ── Animations ────────────────────────────────────────────────
+@keyframes ht-fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ht-fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ht-pinPulse {
+  0%, 100% { opacity: 1;  transform: scale(1); }
+  50%       { opacity: .6; transform: scale(1.07); }
+}
+
+@keyframes ht-ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+// ── Root ──────────────────────────────────────────────────────
+.hero-typo {
+  display        : grid;
+  grid-template-rows: 1fr auto;
+  min-height     : 100vh;
+  font-family    : $font-body;
+  background     : $cream;
+  color          : $ink;
+  overflow       : hidden;
+}
+
+// ── Main 3-col grid ───────────────────────────────────────────
+.hero-typo__main {
+  display             : grid;
+  grid-template-columns: 56px 1fr 460px;
+  align-items         : stretch;
+  min-height          : calc(100vh - 80px);
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 56px 1fr 360px;
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    grid-template-rows   : auto 320px;
+    min-height           : auto;
+  }
+}
+
+// ── Rail ──────────────────────────────────────────────────────
+.hero-typo__rail {
+  border-right    : 1px solid $rule;
+  display         : flex;
+  flex-direction  : column;
+  justify-content : center;
+  align-items     : center;
+  padding         : 32px 0;
+  gap             : 20px;
+
+  @media (max-width: 860px) { display: none; }
+}
+
+.hero-typo__rail-dot {
+  width         : 5px;
+  height        : 5px;
+  border-radius : 50%;
+  background    : $accent;
+  flex-shrink   : 0;
+}
+
+.hero-typo__rail-text {
+  font-size      : 9px;
+  font-weight    : 500;
+  letter-spacing : .28em;
+  text-transform : uppercase;
+  color          : $muted;
+  writing-mode   : vertical-rl;
+  transform      : rotate(180deg);
+  white-space    : nowrap;
+}
+
+// ── Center text ───────────────────────────────────────────────
+.hero-typo__center {
+  display         : flex;
+  flex-direction  : column;
+  justify-content : center;
+  padding         : 64px 52px 64px 44px;
+  border-right    : 1px solid $rule;
+  position        : relative;
+
+  @media (max-width: 860px) {
+    padding      : 48px 28px;
+    border-right : none;
+    border-bottom: 1px solid $rule;
+  }
+
+  @media (max-width: 480px) { padding: 40px 20px; }
+}
+
+// Large decorative number
+.hero-typo__number {
+  display        : block;
+  font-family    : $font-display;
+  font-size      : clamp(100px, 13vw, 160px);
+  font-weight    : 600;
+  line-height    : .85;
+  letter-spacing : -.06em;
+  color          : $rule;
+  margin-bottom  : -12px;
+  user-select    : none;
+  animation      : ht-fadeUp .8s $ease both;
+}
+
+.hero-typo__headline {
+  font-family    : $font-display;
+  font-size      : clamp(34px, 4vw, 54px);
+  font-weight    : 400;
+  line-height    : 1.08;
+  letter-spacing : -.03em;
+  color          : $ink;
+  margin-bottom  : 28px;
+  position       : relative;
+  z-index        : 2;
+  animation      : ht-fadeUp .8s $ease .15s both;
+
+  em {
+    font-style : italic;
+    color      : $accent;
+  }
+}
+
+.hero-typo__body {
+  font-size     : 14.5px;
+  font-weight   : 300;
+  line-height   : 1.78;
+  color         : $muted;
+  max-width     : 400px;
+  margin-bottom : 40px;
+  animation     : ht-fadeUp .8s $ease .25s both;
+}
+
+.hero-typo__actions {
+  display     : flex;
+  align-items : center;
+  gap         : 16px;
+  margin-bottom: 48px;
+  animation   : ht-fadeUp .8s $ease .35s both;
+}
+
+.hero-typo__btn-primary {
+  font-family    : $font-body;
+  font-size      : 11px;
+  font-weight    : 500;
+  letter-spacing : .12em;
+  text-transform : uppercase;
+  color          : $white;
+  background     : $ink;
+  border         : none;
+  padding        : 13px 30px;
+  border-radius  : 2px;
+  cursor         : pointer;
+  transition     : background .25s ease, transform .2s ease;
+
+  &:hover { background: $accent; transform: translateY(-1px); }
+}
+
+.hero-typo__btn-outline {
+  font-family    : $font-body;
+  font-size      : 11px;
+  font-weight    : 500;
+  letter-spacing : .12em;
+  text-transform : uppercase;
+  color          : $ink;
+  background     : none;
+  border         : 1px solid $rule;
+  padding        : 12px 26px;
+  border-radius  : 2px;
+  cursor         : pointer;
+  transition     : border-color .2s ease;
+
+  &:hover { border-color: $ink; }
+}
+
+// ── Stats ─────────────────────────────────────────────────────
+.hero-typo__stats {
+  display     : flex;
+  gap         : 36px;
+  padding-top : 36px;
+  border-top  : 1px solid $rule;
+  animation   : ht-fadeUp .8s $ease .45s both;
+}
+
+.hero-typo__stat {
+  display        : flex;
+  flex-direction : column;
+  gap            : 5px;
+}
+
+.hero-typo__stat-number {
+  font-family    : $font-display;
+  font-size      : 26px;
+  font-weight    : 400;
+  color          : $ink;
+  letter-spacing : -.03em;
+  line-height    : 1;
+}
+
+.hero-typo__stat-label {
+  font-size      : 9.5px;
+  font-weight    : 500;
+  letter-spacing : .14em;
+  text-transform : uppercase;
+  color          : $muted;
+}
+
+// ── Right image ───────────────────────────────────────────────
+.hero-typo__right {
+  position   : relative;
+  overflow   : hidden;
+  background : $ink;
+  animation  : ht-fadeIn 1s $ease .4s both;
+
+  img {
+    position   : absolute;
+    inset      : 0;
+    width      : 100%;
+    height     : 100%;
+    object-fit : cover;
+    opacity    : .6;
+    transition : opacity .5s ease;
+  }
+
+  &:hover img { opacity: .45; }
+}
+
+.hero-typo__tags {
+  position : absolute;
+  top      : 24px;
+  right    : 24px;
+  z-index  : 10;
+  display  : flex;
+  gap      : 8px;
+}
+
+.hero-typo__tag {
+  font-size       : 8.5px;
+  font-weight     : 500;
+  letter-spacing  : .14em;
+  text-transform  : uppercase;
+  padding         : 5px 10px;
+  border-radius   : 100px;
+  border          : 1px solid rgba(255, 255, 255, .3);
+  color           : rgba(255, 255, 255, .7);
+  background      : rgba(0, 0, 0, .2);
+  backdrop-filter : blur(4px);
+}
+
+// ── Animated pin motif ────────────────────────────────────────
+.hero-typo__pin-motif {
+  position        : absolute;
+  top             : 50%;
+  left            : 50%;
+  transform       : translate(-50%, -60%);
+  z-index         : 10;
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  pointer-events  : none;
+}
+
+.hero-typo__pin-circle {
+  width         : 68px;
+  height        : 68px;
+  border-radius : 50%;
+  border        : 2px solid rgba(255, 255, 255, .7);
+  display       : flex;
+  align-items   : center;
+  justify-content: center;
+  position      : relative;
+  animation     : ht-pinPulse 3s ease infinite;
+
+  // Outer rings
+  &::before {
+    content       : '';
+    position      : absolute;
+    inset         : -12px;
+    border-radius : 50%;
+    border        : 1px solid rgba(255, 255, 255, .2);
+    animation     : ht-pinPulse 3s ease infinite .5s;
+  }
+
+  &::after {
+    content       : '';
+    position      : absolute;
+    inset         : -26px;
+    border-radius : 50%;
+    border        : 1px solid rgba(255, 255, 255, .08);
+    animation     : ht-pinPulse 3s ease infinite 1s;
+  }
+}
+
+.hero-typo__pin-dot {
+  width         : 10px;
+  height        : 10px;
+  border-radius : 50%;
+  background    : $accent;
+}
+
+.hero-typo__pin-line {
+  width      : 2px;
+  height     : 44px;
+  background : linear-gradient(to bottom, rgba(255, 255, 255, .7), transparent);
+}
+
+.hero-typo__right-label {
+  position        : absolute;
+  bottom          : 24px;
+  left            : 0;
+  right           : 0;
+  text-align      : center;
+  z-index         : 10;
+  display         : flex;
+  align-items     : center;
+  justify-content : center;
+  gap             : 6px;
+  color           : rgba(255, 255, 255, .5);
+  font-size       : 9px;
+  font-weight     : 500;
+  letter-spacing  : .22em;
+  text-transform  : uppercase;
+}
+
+// ── Ticker ────────────────────────────────────────────────────
+.hero-typo__ticker {
+  height   : 80px;
+  border-top: 1px solid $rule;
+  overflow : hidden;
+  display  : flex;
+  align-items: center;
+
+  @media (max-width: 860px) { display: none; }
+}
+
+.hero-typo__ticker-track {
+  display    : flex;
+  align-items: center;
+  white-space: nowrap;
+  animation  : ht-ticker 24s linear infinite;
+}
+
+.hero-typo__ticker-item {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 18px;
+  padding        : 0 40px;
+  font-size      : 11px;
+  font-weight    : 500;
+  letter-spacing : .14em;
+  text-transform : uppercase;
+  color          : $muted;
+  border-right   : 1px solid $rule;
+  flex-shrink    : 0;
+
+  strong {
+    font-family    : $font-display;
+    font-size      : 19px;
+    font-weight    : 400;
+    color          : $ink;
+    letter-spacing : -.02em;
+    font-style     : italic;
+  }
+}
+
+.hero-typo__ticker-sep {
+  display       : inline-block;
+  width         : 4px;
+  height        : 4px;
+  border-radius : 50%;
+  background    : $accent;
+  flex-shrink   : 0;
+}
