@@ -31,18 +31,26 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   100% { top: 200%; }
 }
 
+// ── Ticker animation ──────────────────────────────────────────
+@keyframes ht-ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 // ── Root ──────────────────────────────────────────────────────
 .hero-editorial {
   display         : grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto; // Added: creates two rows for content + ticker
   min-height      : 100vh;
   font-family     : $font-body;
   background      : $white;
-  overflow        : hidden;
+  position        : relative;
+  // Removed overflow: hidden from here
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    grid-template-rows   : auto 50vw;
+    grid-template-rows   : auto auto 80px; // Added ticker row on mobile
   }
 }
 
@@ -53,6 +61,8 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   justify-content : center;
   padding         : 80px 56px 80px 48px;
   position        : relative;
+  grid-row        : 1; // Explicitly place in first row
+  overflow-y      : auto; // Allow scrolling if needed
 
   // vertical rule between columns
   &::after {
@@ -222,6 +232,7 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   position   : relative;
   overflow   : hidden;
   background : $ink;
+  grid-row   : 1; // Explicitly place in first row
 
   @media (max-width: 900px) { min-height: 50vw; }
 
@@ -270,7 +281,7 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   color        : rgba(255,255,255,.45);
   font-size    : 10px;
   font-weight  : 300;
-  letter-spacing: .1em;
+  letter-spacing : .1em;
   font-style   : italic;
   font-family  : $font-display;
 }
@@ -312,5 +323,71 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
     height     : 100%;
     background : $accent;
     animation  : he-scrollLine 1.8s ease infinite .8s;
+  }
+}
+
+// ── TICKER (FIXED) ────────────────────────────────────────────
+.hero-typo__ticker {
+  grid-column     : 1 / -1; // Span across both columns
+  grid-row        : 2; // Place in second row
+  height          : 80px;
+  border-top      : 1px solid $rule;
+  overflow        : hidden;
+  display         : flex;
+  align-items     : center;
+  background      : $white;
+  position        : relative;
+  z-index         : 5;
+}
+
+.hero-typo__ticker-track {
+  display         : flex;
+  align-items     : center;
+  white-space     : nowrap;
+  animation       : ht-ticker 24s linear infinite;
+  will-change     : transform; // Performance optimization
+
+  &:hover {
+    animation-play-state: paused; // Optional: pause on hover
+  }
+}
+
+.hero-typo__ticker-item {
+  display         : inline-flex;
+  align-items     : center;
+  gap             : 18px;
+  padding         : 0 40px;
+  font-size       : 11px;
+  font-weight     : 500;
+  letter-spacing  : 0.14em;
+  text-transform  : uppercase;
+  color           : #888880;
+  border-right    : 1px solid $rule;
+  flex-shrink     : 0;
+
+  strong {
+    color         : $ink;
+    font-weight   : 600;
+  }
+}
+
+.hero-typo__ticker-sep {
+  display         : inline-block;
+  width           : 1px;
+  height          : 12px;
+  background      : $rule;
+  margin          : 0 4px;
+}
+
+// ── Mobile adjustments ────────────────────────────────────────
+@media (max-width: 900px) {
+  .hero-typo__ticker {
+    height        : 60px; // Slightly smaller on mobile
+  }
+  
+  .hero-typo__ticker-item {
+    padding       : 0 24px;
+    font-size     : 9px;
+    gap           : 12px;
   }
 }

@@ -67,20 +67,6 @@ export default function HeroCinematic() {
         </div>
       </div>
 
-      {/* ── Stat bar ── */}
-      <div className="hero-cinematic__bar" aria-label="Key figures">
-        {STATS.map(({ number, label }) => (
-          <div key={label} className="hero-cinematic__bar-item">
-            <strong>{number}</strong>
-            {label}
-          </div>
-        ))}
-      </div>
-
-      {/* ── Side coordinate ── */}
-      <p className="hero-cinematic__side" aria-hidden="true">
-        6.4550° N · 3.3841° E · LAGOS, NG
-      </p>
 
     </section>
   );
