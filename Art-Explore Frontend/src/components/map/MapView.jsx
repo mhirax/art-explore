@@ -108,10 +108,19 @@ const MapView = () => {
   // ── Reset to overview ─────────────────────────────────────
   const resetView = useCallback(() => {
     if (!mapRef.current) return;
-    mapRef.current.fitBounds(ALL_BOUNDS, {
-      padding: FIT_PADDING,
-      duration: 1000,
-    });
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      mapRef.current.fitBounds(ALL_BOUNDS, {
+        padding: { top: 80, bottom: 80, left: 30, right: 30 },
+        duration: 1000,
+        maxZoom: 11.5,
+      });
+    } else {
+      mapRef.current.fitBounds(ALL_BOUNDS, {
+        padding: FIT_PADDING,
+        duration: 1000,
+      });
+    }
     setSelectedGallery(null);
   }, []);
 
@@ -164,14 +173,23 @@ const MapView = () => {
       map.getSource("galleries").setData(buildGalleriesGeoJSON(filtered));
 
       // Fit bounds to the filtered set
+      const isMobile = window.innerWidth <= 768;
       if (region === "All") {
-        map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
+        if (isMobile) {
+          map.fitBounds(ALL_BOUNDS, {
+            padding: { top: 80, bottom: 80, left: 30, right: 30 },
+            duration: 800,
+            maxZoom: 11.5,
+          });
+        } else {
+          map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
+        }
       } else {
         const bounds = new maplibregl.LngLatBounds();
         filtered.forEach((g) => bounds.extend([g.lng, g.lat]));
         map.fitBounds(bounds, {
-          padding: FIT_PADDING,
-          maxZoom: 13,
+          padding: isMobile ? { top: 80, bottom: 80, left: 30, right: 30 } : FIT_PADDING,
+          maxZoom: isMobile ? 12 : 13,
           duration: 800,
         });
       }
@@ -181,12 +199,14 @@ const MapView = () => {
   
   // ── Map initialisation ────────────────────────────────────
   useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
-      center: ALL_GALLERIES_CENTER,
-      zoom: 10,
-      minZoom: 9,
+      center: isMobile ? [3.385, 6.5083] : ALL_GALLERIES_CENTER,
+      zoom: isMobile ? 10.5 : 10,
+      minZoom: isMobile ? 8.5 : 9,
       maxBounds: [
         [2.9, 6.1],
         [3.9, 6.9],
@@ -519,11 +539,11 @@ const MapView = () => {
             ["linear"],
             ["zoom"],
             10,
-            1.2,
+            isMobile ? 0.9 : 1.2,
             14,
-            1.8,
+            isMobile ? 1.3 : 1.8,
             15,
-            2.2,
+            isMobile ? 1.5 : 2.2,
           ],
           "icon-anchor": "bottom", // pin tip points at exact coordinate
           "icon-allow-overlap": true, // always show all pins
@@ -540,10 +560,10 @@ const MapView = () => {
         id: "gallery-labels",
         type: "symbol",
         source: "galleries",
-        minzoom: 13,
+        minzoom: isMobile ? 14 : 13,
         layout: {
           "text-field": ["get", "name"],
-          "text-size": 11,
+          "text-size": isMobile ? 9 : 11,
           "text-font": ["Open Sans SemiBold", "Arial Unicode MS Bold"],
           "text-anchor": "top",
           "text-offset": [0, 0.6],
@@ -568,7 +588,7 @@ const MapView = () => {
           // Show rich popup
           new maplibregl.Popup({
             offset: [0, -42],
-            maxWidth: "300px",
+            maxWidth: isMobile ? "260px" : "300px",
             closeButton: true,
             className: "gallery-popup-wrapper",
           })
@@ -608,7 +628,15 @@ const MapView = () => {
 
       // ── Fit ALL 15 into view once tiles + symbols painted ─
       map.once("idle", () => {
-        map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
+        if (isMobile) {
+          map.fitBounds(ALL_BOUNDS, {
+            padding: { top: 80, bottom: 80, left: 30, right: 30 },
+            duration: 800,
+            maxZoom: 11.5,
+          });
+        } else {
+          map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
+        }
       });
     }); // end map.on("load")
 
@@ -617,6 +645,42 @@ const MapView = () => {
       setMapReady(false);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Window resize handler for orientation change ────────────
+  useEffect(() => {
+    if (!mapRef.current || !mapReady) return;
+
+    const handleResize = () => {
+      const map = mapRef.current;
+      if (!map) return;
+
+      // Resize the map to fit new container size
+      map.resize();
+
+      // Adjust view based on new width
+      const isMobile = window.innerWidth <= 768;
+      const currentBounds = map.getBounds();
+
+      // If map is currently showing all bounds, refit with new padding
+      if (
+        currentBounds.getWest() <= ALL_BOUNDS[0][0] + 0.01 &&
+        currentBounds.getEast() >= ALL_BOUNDS[1][0] - 0.01
+      ) {
+        if (isMobile) {
+          map.fitBounds(ALL_BOUNDS, {
+            padding: { top: 80, bottom: 80, left: 30, right: 30 },
+            duration: 300,
+            maxZoom: 11.5,
+          });
+        } else {
+          map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 300 });
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [mapReady]);
 
   // ── Region filter effect ──────────────────────────────────
   useEffect(() => {
