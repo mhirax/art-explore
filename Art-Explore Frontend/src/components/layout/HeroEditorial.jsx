@@ -59,7 +59,17 @@ export default function HeroEditorial() {
             <ArrowIcon />
           </button>
         </div>
+           <div className="hero-editorial__stats">
+          {STATS.map(({ number, label }) => (
+            <div key={label} className="hero-editorial__stat">
+              <span className="hero-editorial__stat-number">{number}</span>
+              <span className="hero-editorial__stat-label">{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
+
+        
 
       {/* ── RIGHT — image column ── */}
       <div className="hero-editorial__right" aria-hidden="true">

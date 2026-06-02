@@ -29,7 +29,6 @@ const ZOOM = { overview: 11, district: 12, street: 14, detail: 16 };
 const FIT_PADDING = { top: 100, bottom: 60, left: 60, right: 280 };
 
 // ── create GeoJSON from galleries array ────────────────────────
-// Each gallery becomes a GeoJSON Point feature.
 const buildGalleriesGeoJSON = (galleryList) => ({
   type: "FeatureCollection",
   features: galleryList.map((g) => ({
@@ -61,6 +60,14 @@ const createPinImage = () =>
     img.src = `data:image/svg+xml;base64,${btoa(svg)}`;
   });
 
+// Helper function to get center of first few galleries for mobile
+const getMobileBounds = (galleriesList, count = 3) => {
+  const bounds = new maplibregl.LngLatBounds();
+  const galleriesToShow = galleriesList.slice(0, count);
+  galleriesToShow.forEach((g) => bounds.extend([g.lng, g.lat]));
+  return bounds;
+};
+
 // ── Component ─────────────────────────────────────────────────
 const MapView = () => {
   const mapContainer = useRef(null);
@@ -80,9 +87,10 @@ const MapView = () => {
   // ── Fly to a gallery ─────────────────────────────────────
   const flyToGallery = useCallback((gallery) => {
     if (!mapRef.current) return;
+    const isMobile = window.innerWidth <= 768;
     mapRef.current.flyTo({
       center: [gallery.lng, gallery.lat],
-      zoom: ZOOM.detail,
+      zoom: isMobile ? 18 : ZOOM.detail, // Even closer zoom on mobile
       speed: 1.2,
       curve: 1.4,
       easing: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
@@ -95,9 +103,10 @@ const MapView = () => {
   // ── Fly to a neighbourhood ────────────────────────────────
   const flyToNeighbourhood = useCallback((lng, lat, zoom = ZOOM.district) => {
     if (!mapRef.current) return;
+    const isMobile = window.innerWidth <= 768;
     mapRef.current.flyTo({
       center: [lng, lat],
-      zoom,
+      zoom: isMobile ? 16 : zoom,
       speed: 1.0,
       curve: 1.2,
       easing: (t) => 1 - Math.pow(1 - t, 3),
@@ -110,10 +119,13 @@ const MapView = () => {
     if (!mapRef.current) return;
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
-      mapRef.current.fitBounds(ALL_BOUNDS, {
-        padding: { top: 80, bottom: 80, left: 30, right: 30 },
-        duration: 1000,
-        maxZoom: 11.5,
+      // On mobile, zoom in extremely close to first 3 galleries
+      const bounds = getMobileBounds(galleries, 3);
+      mapRef.current.fitBounds(bounds, {
+        padding: { top: 20, bottom: 20, left: 20, right: 20 },
+        duration: 800,
+        maxZoom: 18,
+        minZoom: 16,
       });
     } else {
       mapRef.current.fitBounds(ALL_BOUNDS, {
@@ -122,7 +134,7 @@ const MapView = () => {
       });
     }
     setSelectedGallery(null);
-  }, []);
+  }, [galleries]);
 
   // ── Apply layer visibility ────────────────────────────────
   const applyLayerVisibility = useCallback((layers) => {
@@ -161,41 +173,51 @@ const MapView = () => {
   );
 
   // ── Update gallery filter (region button) ────────────────
-  // Updates the GeoJSON source data to only include visible region.
   const updateGalleryFilter = useCallback(
     (region) => {
       const map = mapRef.current;
       if (!map || !mapReady || !map.getSource("galleries")) return;
+      
       const filtered =
         region === "All"
           ? galleries
           : galleries.filter((g) => g.region === region);
+      
       map.getSource("galleries").setData(buildGalleriesGeoJSON(filtered));
 
-      // Fit bounds to the filtered set
+      // Fit bounds based on device and region
       const isMobile = window.innerWidth <= 768;
-      if (region === "All") {
-        if (isMobile) {
-          map.fitBounds(ALL_BOUNDS, {
-            padding: { top: 80, bottom: 80, left: 30, right: 30 },
-            duration: 800,
-            maxZoom: 11.5,
-          });
-        } else {
-          map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
-        }
-      } else {
+      
+      if (isMobile) {
+        // ALWAYS zoom in extremely close on mobile regardless of region
+        // Show only first 3 galleries from filtered results
+        const galleriesToShow = filtered.slice(0, 3);
         const bounds = new maplibregl.LngLatBounds();
-        filtered.forEach((g) => bounds.extend([g.lng, g.lat]));
+        galleriesToShow.forEach((g) => bounds.extend([g.lng, g.lat]));
+        
         map.fitBounds(bounds, {
-          padding: isMobile ? { top: 80, bottom: 80, left: 30, right: 30 } : FIT_PADDING,
-          maxZoom: isMobile ? 12 : 13,
+          padding: { top: 20, bottom: 20, left: 20, right: 20 },
           duration: 800,
+          maxZoom: 18,
+          minZoom: 16,
         });
+      } else {
+        // Desktop behavior
+        if (region === "All") {
+          map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
+        } else {
+          const bounds = new maplibregl.LngLatBounds();
+          filtered.forEach((g) => bounds.extend([g.lng, g.lat]));
+          map.fitBounds(bounds, {
+            padding: FIT_PADDING,
+            maxZoom: 13,
+            duration: 800,
+          });
+        }
       }
     },
     [galleries, mapReady],
-  ); // ✅ Added dependencies
+  );
   
   // ── Map initialisation ────────────────────────────────────
   useEffect(() => {
@@ -204,10 +226,12 @@ const MapView = () => {
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
-      center: isMobile ? [3.385, 6.5083] : ALL_GALLERIES_CENTER,
-      zoom: isMobile ? 10.5 : 10,
-      minZoom: isMobile ? 8.5 : 9,
-      maxBounds: [
+      // On mobile, center on first gallery for extreme zoom
+      center: isMobile ? [galleries[0].lng, galleries[0].lat] : ALL_GALLERIES_CENTER,
+      zoom: isMobile ? 17 : 10, // Extreme zoom on mobile (street level)
+      minZoom: isMobile ? 15 : 9, // Can't zoom out too far on mobile
+      maxZoom: isMobile ? 19 : 18, // Can zoom in even closer
+      maxBounds: isMobile ? null : [ // No bounds on mobile for full flexibility
         [2.9, 6.1],
         [3.9, 6.9],
       ],
@@ -228,7 +252,6 @@ const MapView = () => {
 
     map.on("load", async () => {
       // ── Load pin image into MapLibre sprite atlas ────────
-      // Must be done before adding the symbol layer.
       const pinImg = await createPinImage();
       map.addImage("gallery-pin", pinImg, { pixelRatio: 2 });
 
@@ -283,7 +306,7 @@ const MapView = () => {
         type: "symbol",
         source: "neighbourhoods",
         filter: ["!=", ["get", "category"], "green-zone"],
-        minzoom: ZOOM.overview,
+        minzoom: isMobile ? 14 : ZOOM.overview, // Labels appear later on mobile to avoid clutter
         layout: {
           "text-field": ["get", "name"],
           "text-size": [
@@ -291,11 +314,11 @@ const MapView = () => {
             ["linear"],
             ["zoom"],
             10,
-            11,
+            isMobile ? 10 : 11,
             13,
+            isMobile ? 12 : 15,
             15,
-            15,
-            18,
+            isMobile ? 14 : 18,
           ],
           "text-font": ["Open Sans SemiBold", "Arial Unicode MS Bold"],
           "text-anchor": "center",
@@ -357,10 +380,10 @@ const MapView = () => {
         id: "green-zone-label",
         type: "symbol",
         source: "green-zones",
-        minzoom: 11,
+        minzoom: isMobile ? 14 : 11,
         layout: {
           "text-field": ["get", "name"],
-          "text-size": 11,
+          "text-size": isMobile ? 11 : 11,
           "text-font": ["Open Sans Italic", "Arial Unicode MS Regular"],
           "text-anchor": "center",
         },
@@ -383,10 +406,10 @@ const MapView = () => {
         id: "landmark-icon",
         type: "symbol",
         source: "landmarks",
-        minzoom: 11,
+        minzoom: isMobile ? 14 : 11,
         layout: {
           "text-field": ["get", "icon"],
-          "text-size": ["interpolate", ["linear"], ["zoom"], 11, 14, 14, 20],
+          "text-size": ["interpolate", ["linear"], ["zoom"], 11, isMobile ? 20 : 14, 14, isMobile ? 26 : 20],
           "text-allow-overlap": false,
         },
         paint: {
@@ -405,10 +428,10 @@ const MapView = () => {
         id: "landmark-label",
         type: "symbol",
         source: "landmarks",
-        minzoom: 12,
+        minzoom: isMobile ? 15 : 12,
         layout: {
           "text-field": ["get", "name"],
-          "text-size": 11,
+          "text-size": isMobile ? 12 : 11,
           "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
           "text-anchor": "top",
           "text-offset": [0, 1.2],
@@ -491,7 +514,7 @@ const MapView = () => {
         maxzoom: 11,
         layout: {
           "text-field": "ISLAND",
-          "text-size": 12,
+          "text-size": isMobile ? 10 : 12,
           "text-letter-spacing": 0.2,
           "text-font": ["Open Sans SemiBold", "Arial Unicode MS Bold"],
         },
@@ -508,7 +531,7 @@ const MapView = () => {
         maxzoom: 11,
         layout: {
           "text-field": "MAINLAND",
-          "text-size": 12,
+          "text-size": isMobile ? 10 : 12,
           "text-letter-spacing": 0.2,
           "text-font": ["Open Sans SemiBold", "Arial Unicode MS Bold"],
         },
@@ -520,14 +543,12 @@ const MapView = () => {
       });
 
       // ── 5. Gallery pins — GeoJSON symbol layer ───────────
-      // This replaces all DOM markers. Points live on the WebGL canvas,
-      // never outside the container, never clipped by overflow:hidden.
       map.addSource("galleries", {
         type: "geojson",
-        data: buildGalleriesGeoJSON(galleries), // all 15 on load
+        data: buildGalleriesGeoJSON(galleries),
       });
 
-      // Pin icon layer
+      // Pin icon layer - EXTREMELY LARGE on mobile
       map.addLayer({
         id: "gallery-pins",
         type: "symbol",
@@ -539,56 +560,54 @@ const MapView = () => {
             ["linear"],
             ["zoom"],
             10,
-            isMobile ? 0.9 : 1.2,
+            isMobile ? 2.8 : 1.2, // Huge pins on mobile
             14,
-            isMobile ? 1.3 : 1.8,
+            isMobile ? 3.5 : 1.8,
             15,
-            isMobile ? 1.5 : 2.2,
+            isMobile ? 4.0 : 2.2,
           ],
-          "icon-anchor": "bottom", // pin tip points at exact coordinate
-          "icon-allow-overlap": true, // always show all pins
+          "icon-anchor": "bottom",
+          "icon-allow-overlap": true,
           "icon-ignore-placement": true,
-          "text-field": "", // no label on pin itself
+          "text-field": "",
         },
         paint: {
           "icon-opacity": ["interpolate", ["linear"], ["zoom"], 8.5, 0, 9.5, 1],
         },
       });
 
-      // Gallery name label — appears below pin at higher zooms
+      // Gallery name label — appears early on mobile
       map.addLayer({
         id: "gallery-labels",
         type: "symbol",
         source: "galleries",
-        minzoom: isMobile ? 14 : 13,
+        minzoom: isMobile ? 11 : 13, // Labels appear early on mobile
         layout: {
           "text-field": ["get", "name"],
-          "text-size": isMobile ? 9 : 11,
+          "text-size": isMobile ? 16 : 11, // Much larger text on mobile
           "text-font": ["Open Sans SemiBold", "Arial Unicode MS Bold"],
           "text-anchor": "top",
-          "text-offset": [0, 0.6],
+          "text-offset": [0, 1.0],
           "text-max-width": 10,
           "text-allow-overlap": false,
         },
         paint: {
           "text-color": "#1a1a2e",
           "text-halo-color": "rgba(255,255,255,0.95)",
-          "text-halo-width": 2,
-          "text-opacity": ["interpolate", ["linear"], ["zoom"], 13, 0, 14, 1],
+          "text-halo-width": 3,
+          "text-opacity": ["interpolate", ["linear"], ["zoom"], 11, 0, 12, 1],
         },
       });
 
       // ── Click on a gallery pin → open card ───────────────
       map.on("click", "gallery-pins", (e) => {
         const props = e.features[0].properties;
-        // Reconstruct the full gallery object from stored properties
         const gallery = galleries.find((g) => g.id === props.id);
         if (gallery) {
           flyToGallery(gallery);
-          // Show rich popup
           new maplibregl.Popup({
-            offset: [0, -42],
-            maxWidth: isMobile ? "260px" : "300px",
+            offset: [0, -60],
+            maxWidth: isMobile ? "90vw" : "300px",
             closeButton: true,
             className: "gallery-popup-wrapper",
           })
@@ -626,25 +645,29 @@ const MapView = () => {
 
       setMapReady(true);
 
-      // ── Fit ALL 15 into view once tiles + symbols painted ─
+      // ── Fit to show only 2-3 markers on mobile ───────────
       map.once("idle", () => {
         if (isMobile) {
-          map.fitBounds(ALL_BOUNDS, {
-            padding: { top: 80, bottom: 80, left: 30, right: 30 },
+          const firstThreeGalleries = galleries.slice(0, 3);
+          const bounds = new maplibregl.LngLatBounds();
+          firstThreeGalleries.forEach((g) => bounds.extend([g.lng, g.lat]));
+          map.fitBounds(bounds, {
+            padding: { top: 20, bottom: 20, left: 20, right: 20 },
             duration: 800,
-            maxZoom: 11.5,
+            maxZoom: 18,
+            minZoom: 16,
           });
         } else {
           map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 800 });
         }
       });
-    }); // end map.on("load")
+    });
 
     return () => {
       map.remove();
       setMapReady(false);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [galleries]);
 
   // ── Window resize handler for orientation change ────────────
   useEffect(() => {
@@ -654,25 +677,28 @@ const MapView = () => {
       const map = mapRef.current;
       if (!map) return;
 
-      // Resize the map to fit new container size
       map.resize();
 
-      // Adjust view based on new width
       const isMobile = window.innerWidth <= 768;
-      const currentBounds = map.getBounds();
-
-      // If map is currently showing all bounds, refit with new padding
-      if (
-        currentBounds.getWest() <= ALL_BOUNDS[0][0] + 0.01 &&
-        currentBounds.getEast() >= ALL_BOUNDS[1][0] - 0.01
-      ) {
-        if (isMobile) {
-          map.fitBounds(ALL_BOUNDS, {
-            padding: { top: 80, bottom: 80, left: 30, right: 30 },
-            duration: 300,
-            maxZoom: 11.5,
-          });
-        } else {
+      const currentZoom = map.getZoom();
+      
+      if (isMobile && currentZoom < 15) {
+        // If on mobile and zoomed out too far, zoom in extremely close
+        const firstThreeGalleries = galleries.slice(0, 3);
+        const bounds = new maplibregl.LngLatBounds();
+        firstThreeGalleries.forEach((g) => bounds.extend([g.lng, g.lat]));
+        map.fitBounds(bounds, {
+          padding: { top: 20, bottom: 20, left: 20, right: 20 },
+          duration: 300,
+          maxZoom: 18,
+          minZoom: 16,
+        });
+      } else if (!isMobile) {
+        const currentBounds = map.getBounds();
+        if (
+          currentBounds.getWest() <= ALL_BOUNDS[0][0] + 0.01 &&
+          currentBounds.getEast() >= ALL_BOUNDS[1][0] - 0.01
+        ) {
           map.fitBounds(ALL_BOUNDS, { padding: FIT_PADDING, duration: 300 });
         }
       }
@@ -680,7 +706,7 @@ const MapView = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [mapReady]);
+  }, [mapReady, galleries]);
 
   // ── Region filter effect ──────────────────────────────────
   useEffect(() => {
