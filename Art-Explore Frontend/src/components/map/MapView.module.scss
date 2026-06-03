@@ -12,22 +12,21 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 
 .mapWrapper {
   position:   relative;
-  height:     100vh;  // Full viewport height
+  height:     90vh;
   width:      100%;
-  max-width:  100%;    // Full width
-  margin:     0;
+  max-width:  1400px;
+  margin:     0 auto;
   display:    flex;
   flex-direction: column;
   gap:        0;
   font-family: $font;
 
   @media (max-width: 768px) { 
-    height: 100vh;  // Full screen on mobile
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    height: 80vh;  // Map takes 80% of viewport, not full screen
+    position: relative;
+  }
+  @media (max-width: 480px) { 
+    height: 75vh;
   }
 }
 
@@ -37,23 +36,20 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
   justify-content: center;
   align-items:     center;
   gap:             8px;
-  padding:         10px 0 10px 0;
+  padding:         10px 0;
   flex-wrap:       wrap;
   z-index:         10;
 
   @media (max-width: 768px) {
-    gap: 8px;
+    gap: 6px;
     padding: 8px 12px;
     background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(8px);
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    width: auto;
+    backdrop-filter: blur(4px);
+    position: sticky;
+    top: 0;
     z-index: 20;
+    border-radius: 0;
+    margin-bottom: 4px;
   }
 }
 
@@ -112,8 +108,6 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
   @media (max-width: 768px) {
     padding: 8px 12px;
     font-size: 12px;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
 
   @media (max-width: 480px) {
@@ -126,29 +120,33 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 .mapContainer {
   flex:          1;
   width:         100%;
-  border:        none;  // Remove border on mobile
-  border-radius: 0;     // No border radius on mobile
+  border:        3px solid $c-border;
+  border-radius: 14px;
   overflow:      hidden;
-  box-shadow:    none;
+  box-shadow:    0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);
   position:      relative;
 
   @media (max-width: 768px) { 
-    border-radius: 0;
-    border-width: 0;
-    margin: 0;
+    border-radius: 12px;
+    border-width: 2px;
+    margin: 0 4px;
+  }
+  @media (max-width: 480px) { 
+    border-radius: 10px;
+    border-width: 2px;
+    margin: 0 2px;
   }
 }
 
 // ── MapLibre overrides ────────────────────────────────────────
 :global {
 
-  // Gallery markers - HUGE on mobile
+  // Gallery markers - LARGE on mobile for easy tapping
   .gallery-marker {
     width:     36px;
     height:    48px;
     cursor:    pointer;
     position:  relative;
-    z-index:   1000;
 
     svg { 
       width: 100%; 
@@ -159,18 +157,17 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 
     &:hover svg { 
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45)); 
-      transform: scale(1.15); 
+      transform: scale(1.12); 
     }
     transition: transform 0.15s ease;
 
     @media (max-width: 768px) { 
-      width: 80px;  // Very large on mobile
-      height: 106px;
+      width: 55px;  // Large but not huge
+      height: 73px;
     }
-    @media (max-width: 640px) { width: 75px; height: 100px; }
     @media (max-width: 480px) { 
-      width: 70px;
-      height: 93px;
+      width: 50px;
+      height: 66px;
     }
   }
 
@@ -186,19 +183,19 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     animation:    pulse 2s infinite;
 
     @media (max-width: 768px) {
-      width: 20px;
-      height: 20px;
-      bottom: -8px;
+      width: 14px;
+      height: 14px;
+      bottom: -6px;
     }
   }
 
   @keyframes pulse {
     0%   { transform: translateX(-50%) scale(1);   opacity: 0.7; }
-    70%  { transform: translateX(-50%) scale(2.5); opacity: 0; }
+    70%  { transform: translateX(-50%) scale(2.2); opacity: 0; }
     100% { transform: translateX(-50%) scale(1);   opacity: 0; }
   }
 
-  // Popup - Full width on mobile
+  // Popup
   .gallery-popup-wrapper .maplibregl-popup-content {
     padding:       0;
     border-radius: 12px;
@@ -207,10 +204,9 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     border:        1px solid #e2e8f0;
 
     @media (max-width: 768px) {
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      width: 90vw;
-      max-width: 90vw;
+      border-radius: 14px;
+      width: 85vw;
+      max-width: 320px;
     }
   }
 
@@ -221,8 +217,8 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     max-width:      300px;
 
     @media (max-width: 768px) {
-      min-width: 80vw;
-      max-width: 85vw;
+      min-width: auto;
+      width: 100%;
     }
   }
 
@@ -232,7 +228,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     object-fit: cover;
 
     @media (max-width: 768px) { 
-      height: 200px;
+      height: 160px;
     }
   }
 
@@ -240,7 +236,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     padding:  12px 14px 14px;
 
     @media (max-width: 768px) {
-      padding: 16px;
+      padding: 14px;
     }
 
     h4 {
@@ -251,8 +247,8 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
       font-family: $font;
 
       @media (max-width: 768px) {
-        font-size: 18px;
-        margin-bottom: 8px;
+        font-size: 17px;
+        margin-bottom: 6px;
       }
     }
 
@@ -263,7 +259,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
       line-height: 1.4;
 
       @media (max-width: 768px) {
-        font-size: 14px;
+        font-size: 13px;
         margin-bottom: 10px;
       }
     }
@@ -276,8 +272,8 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     margin-bottom: 6px;
 
     @media (max-width: 768px) {
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
   }
 
@@ -290,8 +286,8 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     border-radius: 10px;
 
     @media (max-width: 768px) {
-      font-size: 12px;
-      padding: 4px 12px;
+      font-size: 11px;
+      padding: 3px 10px;
     }
 
     &--island   { background: rgba(26,107,189,0.12); color: #1a6bbd; }
@@ -303,7 +299,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     color:      #94a3b8;
 
     @media (max-width: 768px) {
-      font-size: 13px;
+      font-size: 12px;
     }
   }
 
@@ -313,8 +309,10 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     align-items:     center;
     margin-top:      4px;
 
-    @media (max-width: 768px) {
-      margin-top: 10px;
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
     }
   }
 
@@ -324,7 +322,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     color:       #f59e0b;
 
     @media (max-width: 768px) {
-      font-size: 14px;
+      font-size: 13px;
     }
   }
 
@@ -333,7 +331,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     color:     #94a3b8;
 
     @media (max-width: 768px) {
-      font-size: 13px;
+      font-size: 12px;
     }
   }
 
@@ -346,9 +344,9 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
     max-width:   220px;
 
     @media (max-width: 768px) {
-      padding: 16px;
-      max-width: 280px;
-      gap: 14px;
+      padding: 14px;
+      max-width: 260px;
+      gap: 12px;
     }
 
     .landmark-popup__icon { 
@@ -356,7 +354,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
       flex-shrink: 0;
 
       @media (max-width: 768px) {
-        font-size: 28px;
+        font-size: 26px;
       }
     }
 
@@ -368,7 +366,7 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
       margin-bottom: 3px;
 
       @media (max-width: 768px) {
-        font-size: 16px;
+        font-size: 15px;
       }
     }
     
@@ -379,24 +377,21 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
       line-height: 1.4;
 
       @media (max-width: 768px) {
-        font-size: 14px;
+        font-size: 13px;
       }
     }
   }
 
-  // Maplibre controls - repositioned for full screen map
+  // Maplibre controls adjustments for mobile
   .maplibregl-ctrl-top-right {
     @media (max-width: 768px) {
-      top: auto;
-      bottom: 20px;
-      right: 20px;
+      top: 10px;
+      right: 10px;
       
       .maplibregl-ctrl-group {
         button {
-          width: 44px;
-          height: 44px;
-          background: white;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          width: 36px;
+          height: 36px;
         }
       }
     }
@@ -404,38 +399,15 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 
   .maplibregl-ctrl-bottom-right {
     @media (max-width: 768px) {
-      bottom: 20px;
-      right: 20px;
-      display: none; // Hide attribution on mobile for cleaner look
+      bottom: 8px;
+      right: 8px;
     }
   }
 
-  // Map canvas - full screen interaction
-  .maplibregl-canvas {
+  .maplibregl-ctrl-attrib {
     @media (max-width: 768px) {
-      cursor: grab;
-      width: 100% !important;
-      height: 100% !important;
-      
-      &:active {
-        cursor: grabbing;
-      }
-    }
-  }
-  
-  .maplibregl-map {
-    @media (max-width: 768px) {
-      width: 100%;
-      height: 100%;
-    }
-  }
-}
-
-// Hide legend panel on mobile (optional - if you want full screen map)
-@media (max-width: 768px) {
-  :global {
-    .legend-panel {
-      display: none;
+      font-size: 9px;
+      padding: 2px 4px;
     }
   }
 }
@@ -444,13 +416,32 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 @media (hover: none) and (pointer: coarse) {
   .regionBtn, 
   .resetBtn {
-    min-height: 44px;
+    min-height: 40px;
   }
 
   :global {
     .gallery-marker {
-      width: 80px;
-      height: 106px;
+      width: 55px;
+      height: 73px;
+    }
+  }
+}
+
+// Landscape orientation adjustments
+@media (max-width: 768px) and (orientation: landscape) {
+  .mapWrapper {
+    height: 85vh;
+  }
+  
+  .regionBtn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  :global {
+    .gallery-marker {
+      width: 48px;
+      height: 64px;
     }
   }
 }
@@ -469,8 +460,8 @@ $font:       'Inter', 'Segoe UI', system-ui, sans-serif;
 
   :global {
     .gallery-marker {
-      width: 70px;
-      height: 93px;
+      width: 48px;
+      height: 64px;
     }
   }
 }

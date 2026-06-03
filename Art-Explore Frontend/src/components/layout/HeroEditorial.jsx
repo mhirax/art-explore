@@ -83,20 +83,11 @@ export default function HeroEditorial() {
       </div>
 
       {/* ── RIGHT — image column ── */}
-      <div className="hero-editorial__right" aria-hidden="true">
-        <div className="hero-editorial__grid-overlay" />
+      <div className="hero-editorial__right" >
         <img
           src="https://b2128690.smushcdn.com/2128690/wp-content/uploads/2022/10/best-art-galleries-lagos-pyramid-1920x1280.jpg?lossy=2&strip=1&webp=1"
           alt="Lagos gallery interior"
-        />
-        <span className="hero-editorial__caption">
-          Pyramid Art Gallery, Lagos Island
-        </span>
-
-        <div className="hero-editorial__scroll-hint">
-          <div className="hero-editorial__scroll-line" />
-          <span>Scroll</span>
-        </div>
+        /> 
       </div>
     </section>
   );
