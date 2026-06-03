@@ -185,10 +185,10 @@ const MapView = () => {
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
       center: isMobile
-        ? [galleries[2].lng, galleries[2].lat]
+        ? [galleries[2]?.lng || 3.4004, galleries[2]?.lat || 6.5083]
         : ALL_GALLERIES_CENTER,
-      zoom: isMobile ? 16 : 10, // Very zoomed in on mobile
-      minZoom: isMobile ? 14 : 9, // Can't zoom out far on mobile
+      zoom: isMobile ? 16 : 10,
+      minZoom: isMobile ? 14 : 9,
       maxBounds: isMobile
         ? null
         : [
@@ -209,6 +209,43 @@ const MapView = () => {
       "top-right",
     );
     map.on("zoom", () => setCurrentZoom(Math.round(map.getZoom())));
+
+    // Handle missing images to prevent console errors
+    map.on("styleimagemissing", (e) => {
+      const id = e.id;
+      // Create a simple colored circle for missing icons
+      if (
+        id === "office" ||
+        id === "supermarket" ||
+        id === "school" ||
+        id === "park" ||
+        id === "hospital"
+      ) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 24;
+        canvas.height = 24;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#4a5568";
+        ctx.beginPath();
+        ctx.arc(12, 12, 10, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.font = "14px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(
+          id === "office" ? "🏢" : id === "supermarket" ? "🛒" : "📍",
+          12,
+          12,
+        );
+        const image = canvas.toDataURL();
+        map.loadImage(image, (err, img) => {
+          if (!err && img) {
+            map.addImage(id, img);
+          }
+        });
+      }
+    });
 
     map.on("load", async () => {
       // ── Load pin image into MapLibre sprite atlas ────────
@@ -354,7 +391,7 @@ const MapView = () => {
         },
       });
 
-      // ── 3. Landmarks ─────────────────────────────────────
+      // ── 3. Landmarks - WITH ERROR HANDLING ─────────────────
       const landmarkPoints = {
         type: "FeatureCollection",
         features: landmarksGeoJSON.features.filter(
@@ -362,13 +399,15 @@ const MapView = () => {
         ),
       };
       map.addSource("landmarks", { type: "geojson", data: landmarkPoints });
+
+      // Add landmark icon layer with fallback
       map.addLayer({
         id: "landmark-icon",
         type: "symbol",
         source: "landmarks",
         minzoom: 11,
         layout: {
-          "text-field": ["get", "icon"],
+          "text-field": "📍", // Use emoji as fallback instead of icon
           "text-size": ["interpolate", ["linear"], ["zoom"], 11, 14, 14, 20],
           "text-allow-overlap": false,
         },
@@ -409,7 +448,7 @@ const MapView = () => {
         new maplibregl.Popup({ offset: [0, -8], maxWidth: "240px" })
           .setLngLat(e.features[0].geometry.coordinates)
           .setHTML(
-            `<div class="landmark-popup"><span class="landmark-popup__icon">${p.icon}</span><div><strong>${p.name}</strong><p>${p.description}</p></div></div>`,
+            `<div class="landmark-popup"><span class="landmark-popup__icon">📍</span><div><strong>${p.name}</strong><p>${p.description || "Landmark"}</p></div></div>`,
           )
           .addTo(map);
       });
@@ -502,7 +541,7 @@ const MapView = () => {
         },
       });
 
-      // ── 5. Gallery pins — GeoJSON symbol layer ───────────
+      // ── 5. Gallery pins ───────────────────────────────────
       map.addSource("galleries", {
         type: "geojson",
         data: buildGalleriesGeoJSON(galleries),
@@ -559,7 +598,7 @@ const MapView = () => {
         },
       });
 
-      // ── Click on a gallery pin → open card ───────────────
+      // ── Click on a gallery pin ───────────────────────────
       map.on("click", "gallery-pins", (e) => {
         const props = e.features[0].properties;
         const gallery = galleries.find((g) => g.id === props.id);
