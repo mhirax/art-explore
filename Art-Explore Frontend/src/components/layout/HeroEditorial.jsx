@@ -59,7 +59,7 @@ export default function HeroEditorial() {
             <ArrowIcon />
           </button>
         </div>
-           <div className="hero-editorial__stats">
+        <div className="hero-editorial__stats">
           {STATS.map(({ number, label }) => (
             <div key={label} className="hero-editorial__stat">
               <span className="hero-editorial__stat-number">{number}</span>
@@ -67,9 +67,20 @@ export default function HeroEditorial() {
             </div>
           ))}
         </div>
-      </div>
 
-        
+        {/* ── Ticker ── */}
+        <div className="hero-typo__ticker" aria-hidden="true">
+          <div className="hero-typo__ticker-track">
+            {TICKER_DOUBLED.map(({ title, place }, i) => (
+              <div key={i} className="hero-typo__ticker-item">
+                <strong>{title}</strong>
+                <span className="hero-typo__ticker-sep" />
+                {place}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* ── RIGHT — image column ── */}
       <div className="hero-editorial__right" aria-hidden="true">
@@ -85,19 +96,6 @@ export default function HeroEditorial() {
         <div className="hero-editorial__scroll-hint">
           <div className="hero-editorial__scroll-line" />
           <span>Scroll</span>
-        </div>
-      </div>
-
-      {/* ── Ticker ── */}
-      <div className="hero-typo__ticker" aria-hidden="true">
-        <div className="hero-typo__ticker-track">
-          {TICKER_DOUBLED.map(({ title, place }, i) => (
-            <div key={i} className="hero-typo__ticker-item">
-              <strong>{title}</strong>
-              <span className="hero-typo__ticker-sep" />
-              {place}
-            </div>
-          ))}
         </div>
       </div>
     </section>

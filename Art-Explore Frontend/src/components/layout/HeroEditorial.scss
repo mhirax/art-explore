@@ -328,8 +328,6 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
 
 // ── TICKER (FIXED) ────────────────────────────────────────────
 .hero-typo__ticker {
-  grid-column     : 1 / -1; // Span across both columns
-  grid-row        : 2; // Place in second row
   height          : 80px;
   border-top      : 1px solid $rule;
   overflow        : hidden;
