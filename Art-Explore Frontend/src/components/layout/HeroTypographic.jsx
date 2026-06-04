@@ -1,115 +1,169 @@
 import "./HeroTypographic.scss";
 
+// ── Data ──────────────────────────────────────────────────────
 const STATS = [
   { number: "15+", label: "Galleries" },
-  { number: "2",   label: "Districts" },
-  { number: "6",   label: "Art Forms" },
+  { number: "2", label: "Districts" },
+  { number: "6", label: "Art Forms" },
 ];
 
+const TAGS = ["Contemporary", "Photography", "Sculpture"];
+
 const TICKER_ITEMS = [
-  { title: "Gallery",    place: "Victoria Island" },
-  { title: "Museum",     place: "Lagos Island"    },
-  { title: "Studio",     place: "Yaba"            },
-  { title: "Exhibition", place: "Ikoyi"           },
-  { title: "Art Fair",   place: "Lekki"           },
+  { title: "Studio", place: "Yaba" },
+  { title: "Exhibition", place: "Ikoyi" },
+  { title: "Art Fair", place: "Lekki" },
+  { title: "Gallery", place: "Victoria Island" },
+  { title: "Museum", place: "Lagos Island" },
+  { title: "Workshop", place: "Surulere" },
 ];
 
 // Doubled for seamless infinite loop
 const TICKER_DOUBLED = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
-const PinIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+// ── Icons ─────────────────────────────────────────────────────
+const ArrowIcon = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 14 14"
+    fill="none"
+    aria-hidden="true"
+  >
     <path
-      d="M7 1C4.79 1 3 2.79 3 5c0 3.25 4 8 4 8s4-4.75 4-8c0-2.21-1.79-4-4-4z"
-      fill="currentColor"
+      d="M2 7h10M8 3l4 4-4 4"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <circle cx="7" cy="5" r="1.5" fill="white" />
   </svg>
 );
 
+const MapPinIcon = () => (
+  <svg
+    width="18"
+    height="22"
+    viewBox="0 0 18 22"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M9 1C5.13 1 2 4.13 2 8c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+      fill="currentColor"
+      fillOpacity=".15"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <circle cx="9" cy="8" r="2.5" fill="currentColor" />
+  </svg>
+);
+
+// ── Component ─────────────────────────────────────────────────
 export default function HeroTypographic() {
   return (
-    <section className="hero-typo" aria-label="Lagos Art — Hero">
+    <section className="ht" aria-label="Lagos Art — Hero">
+      {/* ══ TOP SECTION — flex-grow fills above ticker ══ */}
+      <div className="ht__top">
+        {/* ── Col A: vertical sidebar ── */}
+        <aside className="ht__sidebar" aria-hidden="true">
+          <span className="ht__sidebar-label">Explore</span>
+          <div className="ht__sidebar-dots">
+            <span className="ht__dot ht__dot--active" />
+            <span className="ht__dot" />
+            <span className="ht__dot" />
+          </div>
+          <span className="ht__sidebar-num">01 / 03</span>
+        </aside>
 
-      <div className="hero-typo__main">
+        {/* ── Col B: text content ── */}
+        <div className="ht__content">
+          <p className="ht__eyebrow">Lagos Art District</p>
 
-        {/* ── Rail ── */}
-        <div className="hero-typo__rail" aria-hidden="true">
-          <div className="hero-typo__rail-dot" />
-          <span className="hero-typo__rail-text">Lagos Art Guide — 2025</span>
-        </div>
-
-        {/* ── Center text ── */}
-        <div className="hero-typo__center">
-          <span className="hero-typo__number" aria-hidden="true">15</span>
-
-          <h1 className="hero-typo__headline">
-            Art galleries.<br />
-            One <em>living</em> map<br />
-            of Lagos.
+          <h1 className="ht__headline">
+            Discover the
+            <br />
+            <em>galleries</em>
+            <br />
+            of Lagos island.
           </h1>
 
-          <p className="hero-typo__body">
+          <p className="ht__body">
             From the landmark institutions of Victoria Island to the raw
             creative energy of Yaba — every gallery, studio and exhibition
             space, mapped and ready to explore.
           </p>
 
-          <div className="hero-typo__actions">
-            <button className="hero-typo__btn-primary">Open Map</button>
-            <button className="hero-typo__btn-outline">Browse Galleries</button>
+          <div className="ht__actions">
+            <button className="ht__btn-primary">Open Map</button>
+            <button className="ht__btn-ghost">
+              Browse Galleries <ArrowIcon />
+            </button>
           </div>
 
-          <div className="hero-typo__stats">
+          <div className="ht__stats">
             {STATS.map(({ number, label }) => (
-              <div key={label} className="hero-typo__stat">
-                <span className="hero-typo__stat-number">{number}</span>
-                <span className="hero-typo__stat-label">{label}</span>
+              <div key={label} className="ht__stat">
+                <span className="ht__stat-number">{number}</span>
+                <span className="ht__stat-label">{label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── Right image ── */}
-        <div className="hero-typo__right" aria-hidden="true">
-          <img
-            src="https://b2128690.smushcdn.com/2128690/wp-content/uploads/2022/10/best-art-galleries-lagos-pyramid-1920x1280.jpg?lossy=2&strip=1&webp=1"
-            alt="Lagos gallery"
-          />
+        {/* ── Col C: image ── */}
+        <div className="ht__image-col">
+          {/* Frame — decorative offset border */}
+          <div className="ht__image-frame" aria-hidden="true" />
 
-          <div className="hero-typo__tags">
-            <span className="hero-typo__tag">Island</span>
-            <span className="hero-typo__tag">Mainland</span>
-          </div>
+          {/* Image wrapper — absolute fill with bottom gap for gradient breathing room */}
+          <div className="ht__image-wrap">
+            <img
+              src="https://b2128690.smushcdn.com/2128690/wp-content/uploads/2022/10/best-art-galleries-lagos-pyramid-1920x1280.jpg?lossy=2&strip=1&webp=1"
+              alt="Lagos gallery interior showing artworks on walls"
+              className="ht__image"
+            />
 
-          {/* Animated map pin */}
-          <div className="hero-typo__pin-motif">
-            <div className="hero-typo__pin-circle">
-              <div className="hero-typo__pin-dot" />
+            {/* Gradient overlay — bottom fade into cream */}
+            <div className="ht__image-gradient" aria-hidden="true" />
+
+            {/* Tags — top right */}
+            <div className="ht__tags" aria-label="Art categories">
+              {TAGS.map((tag) => (
+                <span key={tag} className="ht__tag">
+                  {tag}
+                </span>
+              ))}
             </div>
-            <div className="hero-typo__pin-line" />
+
+            {/* Animated pin — center */}
+            <div className="ht__pin" aria-hidden="true">
+              <div className="ht__pin-ring" />
+              <div className="ht__pin-ring ht__pin-ring--delay" />
+              <MapPinIcon />
+            </div>
+
+            {/* Location label — bottom center */}
+            <div className="ht__location" aria-label="Location: Lagos, Nigeria">
+              <span className="ht__location-dot" aria-hidden="true" />
+              <span>Lagos, Nigeria · 6.4550° N</span>
+            </div>
           </div>
-
-          <p className="hero-typo__right-label">
-            <PinIcon /> Lagos, Nigeria · 6.4550° N
-          </p>
         </div>
-
       </div>
 
-      {/* ── Ticker ── */}
-      <div className="hero-typo__ticker" aria-hidden="true">
-        <div className="hero-typo__ticker-track">
+      {/* ══ BOTTOM SECTION — ticker ══ */}
+      <div className="ht__ticker-wrap" aria-hidden="true">
+        <div className="ht__ticker-track">
           {TICKER_DOUBLED.map(({ title, place }, i) => (
-            <div key={i} className="hero-typo__ticker-item">
+            <div key={i} className="ht__ticker-item">
               <strong>{title}</strong>
-              <span className="hero-typo__ticker-sep" />
+              <span className="ht__ticker-dot" aria-hidden="true" />
               {place}
             </div>
           ))}
         </div>
       </div>
-
     </section>
   );
 }

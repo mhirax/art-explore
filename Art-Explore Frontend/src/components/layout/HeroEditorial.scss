@@ -21,63 +21,201 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   to   { opacity: .75; transform: scale(1.04); }
 }
 
-@keyframes he-slideRight {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(200%); }
-}
-
 @keyframes he-scrollLine {
   0%   { top: -100%; }
   100% { top: 200%; }
 }
 
-// ── Ticker animation ──────────────────────────────────────────
 @keyframes ht-ticker {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
-// ── GRID ──────────────────────────────────────────────────────
+// ── ROOT SECTION ──────────────────────────────────────────────
+// Two-column grid on desktop.
+// On mobile: single column, order controlled via grid-row.
 .hero-editorial {
   display               : grid;
   grid-template-columns : 1fr 1fr;
-  grid-template-rows    : auto;
-  min-height            : 100vh;
+  // Each column fills the viewport height independently
+  grid-template-rows    : 100vh;
   font-family           : $font-body;
   background            : $white;
   position              : relative;
 
+  // ── Mobile: single column, stacked ──
   @media (max-width: 900px) {
     grid-template-columns : 1fr;
-    grid-template-rows    : auto;
+    grid-template-rows    : auto auto; // image auto-height first, then text+ticker
+    min-height            : 100svh;
   }
 }
 
-// ── LEFT ──────────────────────────────────────────────────────
+// ── RIGHT — image (desktop col 2 / mobile row 1) ─────────────
+.hero-editorial__right {
+  position  : relative;
+  overflow  : hidden;
+
+  // Desktop: column 2, fills full row height
+  grid-column : 2;
+  grid-row    : 1;
+
+  // Mobile: moves to row 1 (top), full width
+  @media (max-width: 900px) {
+    grid-column : 1;
+    grid-row    : 1;
+    min-height  : 56vw;   // keeps a decent image height on mobile
+    max-height  : 420px;
+  }
+
+  img {
+    position   : absolute;
+    inset      : 0;
+    width      : 100%;
+    height     : 100%;
+    object-fit : cover;
+    opacity    : .75;
+    transform  : scale(1.04);
+    animation  : he-imgReveal 1.4s $ease .2s both;
+  }
+}
+
+.hero-editorial__grid-overlay {
+  position         : absolute;
+  inset            : 0;
+  z-index          : 2;
+  background-image :
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size  : 60px 60px;
+}
+
+.hero-editorial__tag {
+  position       : absolute;
+  top            : 48px;
+  left           : 0;
+  z-index        : 10;
+  background     : $accent;
+  color          : $white;
+  font-size      : 9px;
+  font-weight    : 500;
+  letter-spacing : .2em;
+  text-transform : uppercase;
+  padding        : 8px 16px;
+  animation      : he-fadeUp .7s $ease .6s both;
+
+  @media (max-width: 900px) { top: 20px; }
+}
+
+.hero-editorial__caption {
+  position       : absolute;
+  bottom         : 40px;
+  left           : 32px;
+  z-index        : 10;
+  color          : rgba(255,255,255,.45);
+  font-size      : 10px;
+  font-weight    : 300;
+  letter-spacing : .1em;
+  font-style     : italic;
+  font-family    : $font-display;
+}
+
+.hero-editorial__scroll-hint {
+  position       : absolute;
+  bottom         : 40px;
+  right          : 40px;
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  gap            : 10px;
+  z-index        : 10;
+
+  @media (max-width: 900px) { display: none; }
+
+  span {
+    font-size      : 9px;
+    font-weight    : 500;
+    letter-spacing : .2em;
+    text-transform : uppercase;
+    color          : rgba(255,255,255,.5);
+    writing-mode   : vertical-rl;
+  }
+}
+
+.hero-editorial__scroll-line {
+  width      : 1px;
+  height     : 48px;
+  background : rgba(255,255,255,.25);
+  position   : relative;
+  overflow   : hidden;
+
+  &::after {
+    content    : '';
+    position   : absolute;
+    top        : -100%;
+    left       : 0;
+    right      : 0;
+    height     : 100%;
+    background : $accent;
+    animation  : he-scrollLine 1.8s ease infinite .8s;
+  }
+}
+
+// ── LEFT — text column (desktop col 1 / mobile row 2) ────────
+//
+// KEY FIX: This column is a flex column that fills its grid cell.
+//   - overflow is VISIBLE (not auto/hidden) so the full-bleed
+//     ticker is never clipped.
+//   - The inner .hero-editorial__content holds all scrollable
+//     content with its own padding, so we don't need overflow
+//     on the outer shell at all.
+//
 .hero-editorial__left {
   display         : flex;
   flex-direction  : column;
-  justify-content : flex-start;
-  padding         : 80px 56px 0 48px;  // bottom 0 — ticker provides its own bottom boundary
-  position        : relative;
-  z-index         : 1;                 // establishes stacking context; makes ticker z-index effective
-  grid-row        : 1;
-  overflow-y      : auto;
+  // Fill the full grid row height so margin-top:auto on ticker works
+  height          : 100%;
 
+  // Desktop: column 1
+  grid-column     : 1;
+  grid-row        : 1;
+
+  // Mobile: moves to row 2 (below image)
+  @media (max-width: 900px) {
+    grid-column : 1;
+    grid-row    : 2;
+    height      : auto;
+  }
+
+  // Vertical rule separating left / right on desktop
   &::after {
     content    : '';
     position   : absolute;
     top        : 80px;
     bottom     : 80px;
-    right      : 0;
+    // Sits at the midpoint of the grid (left column right edge)
+    left       : 50%;
     width      : 1px;
     background : $rule;
+    pointer-events: none;
 
     @media (max-width: 900px) { display: none; }
   }
+}
 
-  @media (max-width: 900px) { padding: 60px 32px 0; }
-  @media (max-width: 480px) { padding: 48px 20px 0; }
+// ── Content wrapper — carries the padding ─────────────────────
+// Separated from the outer shell so the ticker can bleed full-width
+// without fighting overflow clipping from a padded parent.
+.hero-editorial__content {
+  flex          : 1;           // grows to fill available space above ticker
+  display       : flex;
+  flex-direction: column;
+  padding       : 80px 56px 48px 48px;
+  position      : relative;
+
+  // Coordinate badge — inside content so it respects padding context
+  @media (max-width: 900px) { padding: 48px 32px 40px; }
+  @media (max-width: 480px) { padding: 40px 20px 32px; }
 }
 
 // ── Eyebrow ───────────────────────────────────────────────────
@@ -105,7 +243,7 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
 // ── Headline ──────────────────────────────────────────────────
 .hero-editorial__headline {
   font-family    : $font-display;
-  font-size      : clamp(40px, 5.5vw, 72px);
+  font-size      : clamp(36px, 5.5vw, 72px);
   font-weight    : 400;
   line-height    : 1.05;
   letter-spacing : -.03em;
@@ -126,7 +264,7 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   line-height   : 1.75;
   color         : $muted;
   max-width     : 400px;
-  margin-bottom : 48px;
+  margin-bottom : 40px;
   animation     : he-fadeUp .7s $ease .2s both;
 }
 
@@ -136,6 +274,12 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   align-items : center;
   gap         : 24px;
   animation   : he-fadeUp .7s $ease .3s both;
+
+  @media (max-width: 480px) {
+    flex-direction : column;
+    align-items    : flex-start;
+    gap            : 16px;
+  }
 }
 
 .hero-editorial__btn-primary {
@@ -170,25 +314,24 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   cursor         : pointer;
   transition     : color .2s ease;
 
-  &:hover { color: $ink; }
-
-  svg { transition: transform .2s ease; }
-  &:hover svg { transform: translateX(4px); }
+  &:hover        { color: $ink; }
+  svg            { transition: transform .2s ease; }
+  &:hover svg    { transform: translateX(4px); }
 }
 
 // ── Stats ─────────────────────────────────────────────────────
 .hero-editorial__stats {
   display       : flex;
   gap           : 40px;
-  margin-top    : 56px;
-  padding-top   : 40px;
+  margin-top    : 48px;
+  padding-top   : 36px;
   border-top    : 1px solid $rule;
   animation     : he-fadeUp .7s $ease .4s both;
 
   @media (max-width: 480px) {
     gap         : 24px;
-    margin-top  : 36px;
-    padding-top : 28px;
+    margin-top  : 32px;
+    padding-top : 24px;
   }
 }
 
@@ -217,9 +360,8 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
 
 // ── Coordinate ────────────────────────────────────────────────
 .hero-editorial__coord {
-  position       : absolute;
-  bottom         : 48px;
-  left           : 48px;
+  margin-top     : auto;       // pushes to bottom of content flex column
+  padding-top    : 32px;
   font-size      : 10px;
   font-weight    : 400;
   letter-spacing : .16em;
@@ -230,140 +372,34 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   @media (max-width: 900px) { display: none; }
 }
 
-// ── RIGHT ─────────────────────────────────────────────────────
-.hero-editorial__right {
-  position   : relative;
-  overflow   : hidden;
-  grid-row   : 1;
-
-  @media (max-width: 900px) { min-height: 50vw; }
-
-  img {
-    position   : absolute;
-    inset      : 0;
-    width      : 100%;
-    height     : 70%;
-    object-fit : cover;
-    opacity    : .75;
-    transform  : scale(1.04);
-    animation  : he-imgReveal 1.4s $ease .2s both;
-  }
-}
-
-.hero-editorial__grid-overlay {
-  position         : absolute;
-  inset            : 0;
-  z-index          : 2;
-  background-image :
-    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-  background-size  : 60px 60px;
-}
-
-.hero-editorial__tag {
-  position       : absolute;
-  top            : 48px;
-  left           : 0;
-  z-index        : 10;
-  background     : $accent;
-  color          : $white;
-  font-size      : 9px;
-  font-weight    : 500;
-  letter-spacing : .2em;
-  text-transform : uppercase;
-  padding        : 8px 16px;
-  animation      : he-fadeUp .7s $ease .6s both;
-}
-
-.hero-editorial__caption {
-  position       : absolute;
-  bottom         : 40px;
-  left           : 32px;
-  z-index        : 10;
-  color          : rgba(255,255,255,.45);
-  font-size      : 10px;
-  font-weight    : 300;
-  letter-spacing : .1em;
-  font-style     : italic;
-  font-family    : $font-display;
-}
-
-// ── Scroll hint ───────────────────────────────────────────────
-.hero-editorial__scroll-hint {
-  position       : absolute;
-  bottom         : 40px;
-  right          : 40px;
-  display        : flex;
-  flex-direction : column;
-  align-items    : center;
-  gap            : 10px;
-  z-index        : 10;
-
-  span {
-    font-size      : 9px;
-    font-weight    : 500;
-    letter-spacing : .2em;
-    text-transform : uppercase;
-    color          : rgba(255,255,255,.5);
-    writing-mode   : vertical-rl;
-  }
-}
-
-.hero-editorial__scroll-line {
-  width      : 1px;
-  height     : 48px;
-  background : rgba(255,255,255,.25);
-  position   : relative;
-  overflow   : hidden;
-
-  &::after {
-    content    : '';
-    position   : absolute;
-    top        : -100%;
-    left       : 0;
-    right      : 0;
-    height     : 100%;
-    background : $accent;
-    animation  : he-scrollLine 1.8s ease infinite .8s;
-  }
-}
-
 // ── TICKER ────────────────────────────────────────────────────
+//
+// KEY FIXES:
+//   1. Lives outside .hero-editorial__content so it has no padding to fight.
+//   2. overflow:hidden only on the ticker itself — never on a parent.
+//   3. Full-bleed via negative margin approach is gone; instead the ticker
+//      is a direct flex child of .hero-editorial__left and stretches
+//      edge-to-edge naturally because the left column has no horizontal
+//      overflow clipping.
+//
 .hero-typo__ticker {
-  margin-top   : auto;        // pushes ticker to bottom of flex column
-  flex-shrink  : 0;           // prevents flex from collapsing the 80px height
-  height       : 80px;
-  border-top   : 1px solid $rule;
-  overflow     : hidden;
-  display      : flex;
-  align-items  : center;
-  // background removed — was the white layer covering the scrolling track
-  position     : relative;
-  z-index      : 20;
-  margin-left  : -48px;                    // bleeds to left edge, cancels parent padding
-  margin-right : -56px;                    // bleeds to right edge, cancels parent padding
-  width        : calc(100% + 48px + 56px); // full-bleed width to match
+  flex-shrink    : 0;           // never collapse in flex column
+  height         : 80px;
+  border-top     : 1px solid $rule;
+  overflow       : hidden;      // clip the scrolling track — ONLY this element clips
+  display        : flex;
+  align-items    : center;
+  width          : 100%;        // fill the column width cleanly
 
-  @media (max-width: 900px) {
-    margin-left  : -32px;
-    margin-right : -32px;
-    width        : calc(100% + 64px);
-    height       : 60px;
-  }
-
-  @media (max-width: 480px) {
-    margin-left  : -20px;
-    margin-right : -20px;
-    width        : calc(100% + 40px);
-  }
+  @media (max-width: 900px) { height: 60px; }
 }
 
 .hero-typo__ticker-track {
-  display    : flex;
-  align-items: center;
-  white-space: nowrap;
-  animation  : ht-ticker 24s linear infinite;
-  will-change: transform;
+  display     : flex;
+  align-items : center;
+  white-space : nowrap;
+  animation   : ht-ticker 24s linear infinite;
+  will-change : transform;
 
   &:hover { animation-play-state: paused; }
 }
@@ -375,7 +411,7 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   padding        : 0 40px;
   font-size      : 11px;
   font-weight    : 500;
-  letter-spacing : 0.14em;
+  letter-spacing : .14em;
   text-transform : uppercase;
   color          : #888880;
   border-right   : 1px solid $rule;
@@ -385,6 +421,12 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
     color       : $ink;
     font-weight : 600;
   }
+
+  @media (max-width: 900px) {
+    padding   : 0 24px;
+    font-size : 9px;
+    gap       : 12px;
+  }
 }
 
 .hero-typo__ticker-sep {
@@ -393,13 +435,4 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   height     : 12px;
   background : $rule;
   margin     : 0 4px;
-}
-
-// ── Mobile ticker ─────────────────────────────────────────────
-@media (max-width: 900px) {
-  .hero-typo__ticker-item {
-    padding  : 0 24px;
-    font-size: 9px;
-    gap      : 12px;
-  }
 }

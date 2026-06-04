@@ -2,8 +2,8 @@ import "./HeroEditorial.scss";
 
 const STATS = [
   { number: "15+", label: "Galleries" },
-  { number: "2",   label: "Districts" },
-  { number: "6",   label: "Art Forms" },
+  { number: "2", label: "Districts" },
+  { number: "6", label: "Art Forms" },
 ];
 
 const TICKER_ITEMS = [
@@ -18,7 +18,13 @@ const TICKER_ITEMS = [
 const TICKER_DOUBLED = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
 const ArrowIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 14 14"
+    fill="none"
+    aria-hidden="true"
+  >
     <path
       d="M2 7h10M8 3l4 4-4 4"
       stroke="currentColor"
@@ -32,62 +38,22 @@ const ArrowIcon = () => (
 export default function HeroEditorial() {
   return (
     <section className="hero-editorial" aria-label="Lagos Art — Hero">
-      {/* ── LEFT — text column ── */}
-      <div className="hero-editorial__left">
-        <p className="hero-editorial__eyebrow">Lagos Art District</p>
+    
 
-        <h1 className="hero-editorial__headline">
-          Discover the
-          <br />
-          <em>galleries</em> of
-          <br />
-          Lagos Island
-        </h1>
+        
 
-        <p className="hero-editorial__body">
-          An editorial guide to Lagos's most vital art spaces — from the
-          landmark galleries of Victoria Island to the emerging studios
-          reshaping Yaba and beyond.
-        </p>
 
-        <div className="hero-editorial__actions">
-          <button className="hero-editorial__btn-primary">
-            Explore the Map
-          </button>
-          <button className="hero-editorial__btn-ghost">
-            View all galleries
-            <ArrowIcon />
-          </button>
-        </div>
-        <div className="hero-editorial__stats">
-          {STATS.map(({ number, label }) => (
-            <div key={label} className="hero-editorial__stat">
-              <span className="hero-editorial__stat-number">{number}</span>
-              <span className="hero-editorial__stat-label">{label}</span>
+      {/* ── Ticker ── */}
+      <div className="hero-typo__ticker" aria-hidden="true">
+        <div className="hero-typo__ticker-track">
+          {TICKER_DOUBLED.map(({ title, place }, i) => (
+            <div key={i} className="hero-typo__ticker-item">
+              <strong>{title}</strong>
+              <span className="hero-typo__ticker-sep" />
+              {place}
             </div>
           ))}
         </div>
-
-        {/* ── Ticker ── */}
-        <div className="hero-typo__ticker" aria-hidden="true">
-          <div className="hero-typo__ticker-track">
-            {TICKER_DOUBLED.map(({ title, place }, i) => (
-              <div key={i} className="hero-typo__ticker-item">
-                <strong>{title}</strong>
-                <span className="hero-typo__ticker-sep" />
-                {place}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── RIGHT — image column ── */}
-      <div className="hero-editorial__right" >
-        <img
-          src="https://b2128690.smushcdn.com/2128690/wp-content/uploads/2022/10/best-art-galleries-lagos-pyramid-1920x1280.jpg?lossy=2&strip=1&webp=1"
-          alt="Lagos gallery interior"
-        /> 
       </div>
     </section>
   );

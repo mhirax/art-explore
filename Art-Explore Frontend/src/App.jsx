@@ -82,9 +82,9 @@ function App() {
   return (
     <div className="app">
       <Navbar />
-      <Herosection2 />
+      {/* <Herosection2 /> */}
       {/* <Herosection1 /> */}
-      {/* <Herosection3 /> */}
+      <Herosection3 />
       <Carousel />
       <Mapheader />
       <MapView />
