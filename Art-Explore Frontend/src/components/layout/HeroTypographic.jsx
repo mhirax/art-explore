@@ -12,32 +12,33 @@ const TAGS = ["Contemporary", "Photography", "Sculpture"];
 
 const IMAGES = [
   {
-    src: "https://b2128690.smushcdn.com/2128690/wp-content/uploads/2022/10/best-art-galleries-lagos-pyramid-1920x1280.jpg?lossy=2&strip=1&webp=1",
-    alt: "Lagos gallery interior showing artworks on walls",
+    src: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgbAIluUeGJpVsBlajHVi4Q7zZwTaGO4QZLUZDkKOz91fkCLqculuZkZxsXWGK5lcO4CPa_sPJHS6PHXCxHEwuts9Zk1Tv6Kg8r989a00nNW0wH6R8JbbytNhDkqGljEHc5GzI6BQG9ex8j/s1600/Terra+kulture+lagos.JPG",
+    alt: "terra kulture gallery",
   },
   {
-    src: "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=1200&q=80",
-    alt: "Contemporary art gallery white walls",
+    src: "https://sumellist.com/wp-content/uploads/2023/02/Rele_New_Gallery_Day_1-112.jpg",
+    alt: "Rele gallery",
   },
   {
-    src: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=1200&q=80",
-    alt: "Abstract paintings in a gallery space",
+    src: "https://www.artmajeur.com/medias/standard/s/i/signature-beyond-art-gallery/article/1150264_untitled-12.jpg",
+    alt: "signature beyound art",
   },
   {
-    src: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=1200&q=80",
-    alt: "Sculpture exhibition in a modern gallery",
+    src: "https://africanartists.org/wp-content/uploads/Installations-Coffi-28-scaled.jpg",
+    alt: "African Artists Foundation",
   },
   {
-    src: "https://images.unsplash.com/photo-1572947650440-e8a97ef053b2?w=1200&q=80",
-    alt: "Gallery visitors viewing large format photography",
+    src: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/09/2d/c9/c2/the-national-museum.jpg?w=1200&h=-1&s=1",
+    alt: "National Museum Lagos",
   },
-  {
-    src: "https://images.unsplash.com/photo-1515405295579-ba7b45403062?w=1200&q=80",
-    alt: "Nigerian contemporary art exhibition",
+   {
+    src: "https://www.artmajeur.com/medias/standard/s/i/signature-beyond-art-gallery/article/1150264_untitled-12.jpg",
+    alt: "signature beyound art",
   },
+
   {
-    src: "https://images.unsplash.com/photo-1605429523419-d828acb941d9?w=1200&q=80",
-    alt: "Art fair Lagos with mixed media installations",
+    src: "https://d1rgjmn2wmqeif.cloudfront.net/extra/b/HomePageModule-40923-95830.jpg",
+    alt: "Kalakuta Museum",
   },
 ];
 

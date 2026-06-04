@@ -57,7 +57,7 @@ $ease         : cubic-bezier(.4, 0, .2, 1);
   display        : flex;
   flex-direction : column;
   min-height     : 100vh;
-  background     : $cream;
+  background     : $white;
   font-family    : $font-body;
   position       : relative;
   // No overflow:hidden here — would clip the decorative frame.
