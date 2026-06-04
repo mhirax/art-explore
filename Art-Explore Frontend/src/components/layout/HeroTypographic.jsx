@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import "./HeroTypographic.scss";
 
 // ── Data ──────────────────────────────────────────────────────
@@ -8,6 +9,37 @@ const STATS = [
 ];
 
 const TAGS = ["Contemporary", "Photography", "Sculpture"];
+
+const IMAGES = [
+  {
+    src: "https://b2128690.smushcdn.com/2128690/wp-content/uploads/2022/10/best-art-galleries-lagos-pyramid-1920x1280.jpg?lossy=2&strip=1&webp=1",
+    alt: "Lagos gallery interior showing artworks on walls",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=1200&q=80",
+    alt: "Contemporary art gallery white walls",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=1200&q=80",
+    alt: "Abstract paintings in a gallery space",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=1200&q=80",
+    alt: "Sculpture exhibition in a modern gallery",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1572947650440-e8a97ef053b2?w=1200&q=80",
+    alt: "Gallery visitors viewing large format photography",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1515405295579-ba7b45403062?w=1200&q=80",
+    alt: "Nigerian contemporary art exhibition",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1605429523419-d828acb941d9?w=1200&q=80",
+    alt: "Art fair Lagos with mixed media installations",
+  },
+];
 
 const TICKER_ITEMS = [
   { title: "Studio", place: "Yaba" },
@@ -61,6 +93,16 @@ const MapPinIcon = () => (
 
 // ── Component ─────────────────────────────────────────────────
 export default function HeroTypographic() {
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  // Auto-advance every 4 seconds
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % IMAGES.length);
+    }, 4000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <section className="ht" aria-label="Lagos Art — Hero">
       {/* ══ TOP SECTION — flex-grow fills above ticker ══ */}
@@ -116,13 +158,17 @@ export default function HeroTypographic() {
           {/* Frame — decorative offset border */}
           <div className="ht__image-frame" aria-hidden="true" />
 
-          {/* Image wrapper — absolute fill with bottom gap for gradient breathing room */}
+          {/* Image wrapper — all 7 images stacked; active one fades in */}
           <div className="ht__image-wrap">
-            <img
-              src="https://b2128690.smushcdn.com/2128690/wp-content/uploads/2022/10/best-art-galleries-lagos-pyramid-1920x1280.jpg?lossy=2&strip=1&webp=1"
-              alt="Lagos gallery interior showing artworks on walls"
-              className="ht__image"
-            />
+
+            {IMAGES.map((img, i) => (
+              <img
+                key={i}
+                src={img.src}
+                alt={img.alt}
+                className={`ht__image${i === activeIdx ? " ht__image--active" : ""}`}
+              />
+            ))}
 
             {/* Gradient overlay — bottom fade into cream */}
             <div className="ht__image-gradient" aria-hidden="true" />
@@ -148,6 +194,29 @@ export default function HeroTypographic() {
               <span className="ht__location-dot" aria-hidden="true" />
               <span>Lagos, Nigeria · 6.4550° N</span>
             </div>
+
+            {/* Slide counter — bottom right */}
+            <div className="ht__slide-counter" aria-hidden="true">
+              <span className="ht__slide-current">
+                {String(activeIdx + 1).padStart(2, "0")}
+              </span>
+              <span className="ht__slide-sep" />
+              <span className="ht__slide-total">
+                {String(IMAGES.length).padStart(2, "0")}
+              </span>
+            </div>
+
+            {/* Progress dots — bottom left */}
+            <div className="ht__slide-dots" aria-hidden="true">
+              {IMAGES.map((_, i) => (
+                <button
+                  key={i}
+                  className={`ht__slide-dot${i === activeIdx ? " ht__slide-dot--active" : ""}`}
+                  onClick={() => setActiveIdx(i)}
+                />
+              ))}
+            </div>
+
           </div>
         </div>
       </div>
