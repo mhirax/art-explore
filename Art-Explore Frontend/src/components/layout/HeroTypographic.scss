@@ -64,11 +64,11 @@ $sidebar-w : 56px;
   flex                  : 1 1 0;
   min-height            : 0;          // lets flex child shrink past content size
   display               : grid;
-  grid-template-columns : $sidebar-w 1fr minmax(360px, 44%);
+  grid-template-columns: 1fr 1fr;
   grid-template-rows    : 1fr;
 
   @media (max-width: 1100px) {
-    grid-template-columns: $sidebar-w 1fr minmax(300px, 42%);
+    grid-template-columns: 1fr 1fr;
   }
 
   @media (max-width: 768px) {
@@ -144,7 +144,8 @@ $sidebar-w : 56px;
   display         : flex;
   flex-direction  : column;
   justify-content : center;
-  padding         : 48px 52px 48px 44px;
+  padding         : 30px 20px;
+  margin-bottom    : 20px;
   min-height      : 0;
 
   @media (max-width: 1100px) { padding: 40px 36px; }
@@ -321,15 +322,16 @@ $sidebar-w : 56px;
 
 
 .ht__right {
-  position : relative;
-  overflow : visible; // frame decoration bleeds right
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible; // keep if you want frame bleed, but frame is gone now
 
-  // Mobile: first, fixed height
   @media (max-width: 768px) {
-    order      : 1;
-    height     : 55vw;
-    max-height : 400px;
-    overflow   : hidden;
+    order: 1;
+    height: 55vw;
+    max-height: 400px;
+    overflow: hidden;
   }
 }
 
@@ -350,26 +352,24 @@ $sidebar-w : 56px;
   @media (max-width: 768px) { display: none; }
 }
 
-
 .ht__carousel {
-  position      : absolute;
-  top           : 14px;   // frame peeks above
-  left          : 12px;   // frame peeks left
-  right         : 0;      // flush right edge of column
-  bottom        : 0;      // reaches down to the ticker
-  border-radius : 2px;
-  overflow      : hidden;
-  z-index       : 1;
-  animation     : fadeIn .5s $ease .15s both;
+  position: relative;  // was absolute
+  flex: 1;             // fills remaining height
+  overflow: hidden;
+  border-radius: 2px;
+  animation: fadeIn .5s $ease .15s both;
 
-  @media (max-width: 1100px) { left: 8px; top: 10px; }
+  @media (max-width: 1100px) {
+    // remove left/top overrides — not needed now
+  }
 
   @media (max-width: 768px) {
-    position      : static;
-    width         : 100%;
-    height        : 100%;
-    border-radius : 0;
-    animation     : none;
+    position: static;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    animation: none;
+    flex: none; // override flex:1 on mobile
   }
 }
 

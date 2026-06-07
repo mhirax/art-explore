@@ -24,7 +24,6 @@ const STATS = [
   { number: "6",   label: "Art Forms" },
 ];
 
-const TAGS = ["Contemporary", "Photography", "Sculpture"];
 
 const IMAGES = [
   {
@@ -106,18 +105,7 @@ export default function HeroTypographic() {
       ══════════════════════════════════════════════════════ */}
       <div className="ht__body">
 
-        {/* ── Col A: Sidebar ── */}
-        <aside className="ht__sidebar" aria-hidden="true">
-          <div className="ht__sidebar-inner">
-            <span className="ht__sidebar-label">Explore</span>
-            <div className="ht__sidebar-dots">
-              <span className="ht__dot ht__dot--active" />
-              <span className="ht__dot" />
-              <span className="ht__dot" />
-            </div>
-            <span className="ht__sidebar-num">01 / 03</span>
-          </div>
-        </aside>
+       
 
         {/* ── Col B: Left Panel — all text blocks ── */}
         <div className="ht__left" aria-label="Hero content">
@@ -173,8 +161,7 @@ export default function HeroTypographic() {
         {/* ── Col C: Right Panel — image carousel ── */}
         <div className="ht__right" aria-label="Gallery image carousel">
 
-          {/* Decorative offset frame */}
-          <div className="ht__frame" aria-hidden="true" />
+          
 
           {/* Carousel viewport — clips slides */}
           <div className="ht__carousel">
@@ -197,39 +184,7 @@ export default function HeroTypographic() {
               ))}
             </div>
 
-            {/* Overlays */}
-            <div className="ht__carousel-gradient" aria-hidden="true" />
 
-            {/* Tags */}
-            <div className="ht__tags" aria-label="Art categories">
-              {TAGS.map((tag) => (
-                <span key={tag} className="ht__tag">{tag}</span>
-              ))}
-            </div>
-
-            {/* Map pin */}
-            <div className="ht__pin" aria-hidden="true">
-              <div className="ht__pin-ring" />
-              <div className="ht__pin-ring ht__pin-ring--delay" />
-              <MapPinIcon />
-            </div>
-
-            {/* Location */}
-            <div className="ht__location" aria-label="Location: Lagos, Nigeria">
-              <span className="ht__location-dot" aria-hidden="true" />
-              <span>Lagos, Nigeria · 6.4550° N</span>
-            </div>
-
-            {/* Counter */}
-            <div className="ht__counter" aria-hidden="true">
-              <span className="ht__counter-current">
-                {String(activeIdx + 1).padStart(2, "0")}
-              </span>
-              <span className="ht__counter-sep" />
-              <span className="ht__counter-total">
-                {String(IMAGES.length).padStart(2, "0")}
-              </span>
-            </div>
 
             {/* Progress dots */}
             <div className="ht__dots" aria-label="Go to slide">
