@@ -566,7 +566,6 @@ $sidebar-w : 56px;
   align-items : center;
   white-space : nowrap;
   animation   : ticker 28s linear infinite;
-  will-change : transform;
 
   &:hover { animation-play-state: paused; }
 }
@@ -585,12 +584,12 @@ $sidebar-w : 56px;
 
   strong {
     color          : $ink;
-    font-weight    : 600;
-    font-family    : $font-display;
-    font-style     : italic;
-    font-size      : 13px;
-    letter-spacing : .04em;
-    text-transform : none;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 19px;
+    font-weight: 400;
+    color: #111111;
+    letter-spacing: -0.02em;
+    font-style: italic;
   }
 
   @media (max-width: 768px) {
